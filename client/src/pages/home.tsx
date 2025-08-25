@@ -273,14 +273,14 @@ export default function Home() {
         return (
           <section 
             key={section.id} 
-            className="py-16" 
+            className="py-8" 
             data-testid={`section-${section.title.toLowerCase().replace(/\s+/g, '-')}`}
             style={{ 
               background: section.backgroundColor || 'linear-gradient(135deg, #fef3c7 0%, #fed7aa 100%)' 
             }}
           >
             <div className="container mx-auto px-4">
-              <div className="text-center mb-12">
+              <div className="text-center mb-6">
                 <div className="flex items-center justify-center mb-6">
                   <Star className="h-8 w-8 mr-4" style={{ color: '#b8860b' }} />
                   <h2 className="text-lg sm:text-2xl md:text-4xl font-bold" style={{ color: '#8b4513' }}>
@@ -322,7 +322,7 @@ export default function Home() {
 
       {/* New Arrivals */}
       {newArrivalProducts.length > 0 && (
-        <section className="py-16" data-testid="section-new-arrivals" style={{ background: 'linear-gradient(135deg, #fff8e1 0%, #fef3c7 100%)' }}>
+        <section className="py-8" data-testid="section-new-arrivals" style={{ background: 'linear-gradient(135deg, #fff8e1 0%, #fef3c7 100%)' }}>
           <div className="container mx-auto px-4">
             <div className="text-center mb-12">
               <div className="flex items-center justify-center mb-6">
@@ -362,7 +362,7 @@ export default function Home() {
       
       {/* Gold Collection */}
       {goldProducts.length > 0 && (
-        <section className="py-16" data-testid="section-gold-collection" style={{ background: 'linear-gradient(135deg, #fef3c7 0%, #fed7aa 100%)' }}>
+        <section className="py-8" data-testid="section-gold-collection" style={{ background: 'linear-gradient(135deg, #fef3c7 0%, #fed7aa 100%)' }}>
           <div className="container mx-auto px-4">
             <div className="text-center mb-12">
               <div className="flex items-center justify-center mb-6">
@@ -400,7 +400,7 @@ export default function Home() {
 
       {/* Silver Collection */}
       {silverProducts.length > 0 && (
-        <section className="py-16" data-testid="section-silver-collection" style={{ background: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)' }}>
+        <section className="py-8" data-testid="section-silver-collection" style={{ background: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)' }}>
           <div className="container mx-auto px-4">
             <div className="text-center mb-12">
               <div className="flex items-center justify-center mb-6">
@@ -438,7 +438,7 @@ export default function Home() {
 
       {/* Diamond Collection */}
       {diamondProducts.length > 0 && (
-        <section className="py-16" data-testid="section-diamond-collection" style={{ background: 'linear-gradient(135deg, #fefefe 0%, #f1f5f9 100%)' }}>
+        <section className="py-8" data-testid="section-diamond-collection" style={{ background: 'linear-gradient(135deg, #fefefe 0%, #f1f5f9 100%)' }}>
           <div className="container mx-auto px-4">
             <div className="text-center mb-12">
               <div className="flex items-center justify-center mb-6">
@@ -476,7 +476,7 @@ export default function Home() {
 
       {/* Platinum Collection */}
       {platinumProducts.length > 0 && (
-        <section className="py-16" data-testid="section-platinum-collection" style={{ background: 'linear-gradient(135deg, #f1f5f9 0%, #cbd5e1 100%)' }}>
+        <section className="py-8" data-testid="section-platinum-collection" style={{ background: 'linear-gradient(135deg, #f1f5f9 0%, #cbd5e1 100%)' }}>
           <div className="container mx-auto px-4">
             <div className="text-center mb-12">
               <div className="flex items-center justify-center mb-6">
@@ -514,7 +514,7 @@ export default function Home() {
 
       {/* Gemstone Collection */}
       {gemstoneProducts.length > 0 && (
-        <section className="py-16" data-testid="section-gemstone-collection" style={{ background: 'linear-gradient(135deg, #fef7ed 0%, #fed7aa 100%)' }}>
+        <section className="py-8" data-testid="section-gemstone-collection" style={{ background: 'linear-gradient(135deg, #fef7ed 0%, #fed7aa 100%)' }}>
           <div className="container mx-auto px-4">
             <div className="text-center mb-12">
               <div className="flex items-center justify-center mb-6">
@@ -552,7 +552,7 @@ export default function Home() {
 
       {/* Pearl Collection */}
       {pearlProducts.length > 0 && (
-        <section className="py-16" data-testid="section-pearl-collection" style={{ background: 'linear-gradient(135deg, #fefcf0 0%, #fef3c7 100%)' }}>
+        <section className="py-8" data-testid="section-pearl-collection" style={{ background: 'linear-gradient(135deg, #fefcf0 0%, #fef3c7 100%)' }}>
           <div className="container mx-auto px-4">
             <div className="text-center mb-12">
               <div className="flex items-center justify-center mb-6">
@@ -590,7 +590,7 @@ export default function Home() {
 
       {/* Gold Plated Silver Collection */}
       {goldPlatedSilverProducts.length > 0 && (
-        <section className="py-16" data-testid="section-gold-plated-silver-collection" style={{ background: 'linear-gradient(135deg, #fef9e7 0%, #fbbf24 100%)' }}>
+        <section className="py-8" data-testid="section-gold-plated-silver-collection" style={{ background: 'linear-gradient(135deg, #fef9e7 0%, #fbbf24 100%)' }}>
           <div className="container mx-auto px-4">
             <div className="text-center mb-12">
               <div className="flex items-center justify-center mb-6">
@@ -628,7 +628,7 @@ export default function Home() {
 
       {/* Other Materials Collection */}
       {otherProducts.length > 0 && (
-        <section className="py-16" data-testid="section-other-collection" style={{ background: 'linear-gradient(135deg, #f9fafb 0%, #e5e7eb 100%)' }}>
+        <section className="py-8" data-testid="section-other-collection" style={{ background: 'linear-gradient(135deg, #f9fafb 0%, #e5e7eb 100%)' }}>
           <div className="container mx-auto px-4">
             <div className="text-center mb-12">
               <div className="flex items-center justify-center mb-6">

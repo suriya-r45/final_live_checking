@@ -443,9 +443,9 @@ export default function CollectionsPage({ material, category }: CollectionsPageP
       />
 
       {/* Collection Header */}
-      <section className="py-16" style={{ background: 'linear-gradient(135deg, #fff8e1 0%, #fffbf0 100%)' }}>
+      <section className="py-8" style={{ background: 'linear-gradient(135deg, #fff8e1 0%, #fffbf0 100%)' }}>
         <div className="container mx-auto px-4">
-          <div className="flex items-center justify-between mb-8">
+          <div className="flex items-center justify-between mb-4">
             <Button
               variant="ghost"
               onClick={() => setLocation('/')}
@@ -472,7 +472,7 @@ export default function CollectionsPage({ material, category }: CollectionsPageP
       </section>
 
       {/* Advanced Filters and Search Section - Desktop */}
-      <section className="py-8 bg-gray-50 hidden md:block">
+      <section className="py-4 bg-gray-50 hidden md:block">
         <div className="container mx-auto px-4">
           <div className="flex gap-6 items-center justify-between mb-6">
             {/* Search Bar */}
@@ -686,7 +686,7 @@ export default function CollectionsPage({ material, category }: CollectionsPageP
                     </div>
                   )}
 
-                  <div className="flex justify-between items-center mb-6">
+                  <div className="flex justify-between items-center mb-4">
                     <p className="text-gray-600">
                       Showing {((currentPage - 1) * itemsPerPage) + 1}-{Math.min(currentPage * itemsPerPage, filteredProducts.length)} of {filteredProducts.length} products
                       {selectedMobileFilters.length > 0 && (
