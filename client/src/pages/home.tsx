@@ -192,9 +192,9 @@ export default function Home() {
       case 'featured':
         return 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3';
       case 'mixed':
-        return 'grid-cols-2 md:grid-cols-3 lg:grid-cols-4';
+        return 'grid-cols-3 md:grid-cols-3 lg:grid-cols-4';
       default:
-        return 'grid-cols-2 md:grid-cols-3 lg:grid-cols-4';
+        return 'grid-cols-3 md:grid-cols-3 lg:grid-cols-4';
     }
   };
 
@@ -332,7 +332,7 @@ export default function Home() {
               </div>
               <p className="text-sm sm:text-xl text-black">Latest additions to our exclusive collection</p>
             </div>
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 md:gap-6 mb-8">
+            <div className="grid grid-cols-3 sm:grid-cols-3 lg:grid-cols-4 gap-2 md:gap-6 mb-8">
               {newArrivalProducts.map((product) => (
                 <ProductCard
                   key={product.id}
@@ -372,7 +372,7 @@ export default function Home() {
               </div>
               <p className="text-sm sm:text-xl text-black">Exquisite gold jewelry crafted to perfection</p>
             </div>
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 md:gap-6 mb-8">
+            <div className="grid grid-cols-3 sm:grid-cols-3 lg:grid-cols-4 gap-2 md:gap-6 mb-8">
               {goldProducts.map((product) => (
                 <ProductCard
                   key={product.id}
@@ -410,7 +410,7 @@ export default function Home() {
               </div>
               <p className="text-sm sm:text-xl text-black">Elegant silver jewelry for every occasion</p>
             </div>
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 md:gap-6 mb-8">
+            <div className="grid grid-cols-3 sm:grid-cols-3 lg:grid-cols-4 gap-2 md:gap-6 mb-8">
               {silverProducts.map((product) => (
                 <ProductCard
                   key={product.id}
@@ -448,7 +448,7 @@ export default function Home() {
               </div>
               <p className="text-sm sm:text-xl text-black">Brilliant diamonds for life's special moments</p>
             </div>
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 md:gap-6 mb-8">
+            <div className="grid grid-cols-3 sm:grid-cols-3 lg:grid-cols-4 gap-2 md:gap-6 mb-8">
               {diamondProducts.map((product) => (
                 <ProductCard
                   key={product.id}
@@ -486,7 +486,7 @@ export default function Home() {
               </div>
               <p className="text-sm sm:text-xl text-black">Premium platinum jewelry for discerning taste</p>
             </div>
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 md:gap-6 mb-8">
+            <div className="grid grid-cols-3 sm:grid-cols-3 lg:grid-cols-4 gap-2 md:gap-6 mb-8">
               {platinumProducts.map((product) => (
                 <ProductCard
                   key={product.id}
@@ -524,7 +524,7 @@ export default function Home() {
               </div>
               <p className="text-sm sm:text-xl text-black">Colorful gemstones for vibrant elegance</p>
             </div>
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 md:gap-6 mb-8">
+            <div className="grid grid-cols-3 sm:grid-cols-3 lg:grid-cols-4 gap-2 md:gap-6 mb-8">
               {gemstoneProducts.map((product) => (
                 <ProductCard
                   key={product.id}
