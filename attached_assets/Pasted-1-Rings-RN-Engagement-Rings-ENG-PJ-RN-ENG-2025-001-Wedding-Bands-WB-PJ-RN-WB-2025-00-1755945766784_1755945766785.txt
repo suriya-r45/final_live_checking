@@ -1,0 +1,211 @@
+1. Rings 💍 (RN)
+
+Engagement Rings → ENG → PJ-RN-ENG-2025-001
+
+Wedding Bands → WB → PJ-RN-WB-2025-001
+
+Couple Rings → CR → PJ-RN-CR-2025-001
+
+Cocktail Party Rings → CPR → PJ-RN-CPR-2025-001
+
+Daily Wear Rings → DWR → PJ-RN-DWR-2025-001
+
+Men’s Rings → MR → PJ-RN-MR-2025-001
+
+2. Necklaces 📿 (NK)
+
+Chains → CHN → PJ-NK-CHN-2025-001
+
+Chokers → CH → PJ-NK-CH-2025-001
+
+Lockets → LK → PJ-NK-LK-2025-001
+
+Beaded Necklaces → BD → PJ-NK-BD-2025-001
+
+Collars → COL → PJ-NK-COL-2025-001
+
+Long Necklaces Opera Chains → LON → PJ-NK-LON-2025-001
+
+Multi Layered Necklaces → MLN → PJ-NK-MLN-2025-001
+
+3. Earrings 🌸 (ER)
+
+Studs → ST → PJ-ER-ST-2025-001
+
+Hoops → HP → PJ-ER-HP-2025-001
+
+Drops / Danglers → DR → PJ-ER-DR-2025-001
+
+Chandbalis → CHB → PJ-ER-CHB-2025-001
+
+Jhumkas → JK → PJ-ER-JK-2025-001
+
+Ear Cuffs → EC → PJ-ER-EC-2025-001
+
+Kids Earrings → KER → PJ-ER-KER-2025-001
+
+4. Bracelets 🔗 (BR)
+
+Cuff → CF → PJ-BR-CF-2025-001
+
+Tennis → TN → PJ-BR-TN-2025-001
+
+Charm → CM → PJ-BR-CM-2025-001
+
+Chain → CHN → PJ-BR-CHN-2025-001
+
+Beaded → BD → PJ-BR-BD-2025-001
+
+Link → LK → PJ-BR-LK-2025-001
+
+Bolo → BL → PJ-BR-BL-2025-001
+
+Leather → LTH → PJ-BR-LTH-2025-001
+
+Diamond → DM → PJ-BR-DM-2025-001
+
+Gemstone → GS → PJ-BR-GS-2025-001
+
+Pearl → PRL → PJ-BR-PRL-2025-001
+
+Bridal → BDL → PJ-BR-BDL-2025-001
+
+Minimalist → MIN → PJ-BR-MIN-2025-001
+
+Traditional → TRD → PJ-BR-TRD-2025-001
+
+5. Bangles 💫 (BG)
+
+Classic → CL
+
+Kada → KD
+
+Cuff → CF
+
+Openable → OP
+
+Adjustable → ADJ
+
+Charm → CM
+
+Diamond → DM
+
+Gemstone → GS
+
+Pearl → PRL
+
+Bridal → BDL
+
+Minimalist → MIN
+
+Traditional → TRD
+
+Temple → TMP
+
+Kundan → KND
+
+Polki → PLK
+
+Navratna → NVR
+
+6. Pendants ✨ (PD)
+
+Solitaire → SOL
+
+Halo → HL
+
+Cluster → CLT
+
+Heart → HRT
+
+Cross → CRS
+
+Initial → INI
+
+Diamond → DM
+
+Gemstone → GS
+
+Pearl → PRL
+
+Bridal → BDL
+
+Minimalist → MIN
+
+Traditional → TRD
+
+7. Mangalsutra & Thali Chains 🖤 (MS)
+
+Traditional Mangalsutra → TMS
+
+Modern Mangalsutra → MMS
+
+Thali Thirumangalyam Chains → TTC
+
+8. Nose Jewellery 👃 (NJ)
+
+Nose Pins → NP
+
+Nose Rings / Nath → NR
+
+Septum Rings → SR
+
+9. Anklets & Toe Rings 👣 (AN)
+
+Silver Anklets → SA
+
+Beaded Anklets → BA
+
+Bridal Toe Rings → BTR
+
+Daily Wear Toe Rings → DTR
+
+10. Brooches & Pins 🎀 (BP)
+
+Saree Pins → SP
+
+Suit Brooches → SB
+
+Bridal Brooches → BB
+
+Cufflinks → CLF
+
+Tie Pins → TP
+
+11. Kids Jewellery 🧒 (KJ)
+
+Baby Bangles → BBG
+
+Nazariya Bracelets → NZB
+
+Kids Earrings → KER
+
+Kids Chains → KCH
+
+Kids Rings → KRG
+
+12. Bridal & Special Collections 👰 (SC)
+
+Bridal Sets → BDS
+
+Temple Jewellery Sets → TJS
+
+Antique Jewellery Collections → AJC
+
+Custom Made Jewellery → CMJ
+
+13. Shop by Material / Gemstone 💎 (MT)
+
+Gold Jewellery (22K,18K,14K) → GLD
+
+Silver Jewellery (Sterling, Oxidized) → SLV
+
+Platinum Jewellery → PLT
+
+Diamond Jewellery → DMJ
+
+Gemstone Jewellery → GSJ
+
+Pearl Jewellery → PRJ
+
+Fashion / Artificial Jewellery → FAJ
