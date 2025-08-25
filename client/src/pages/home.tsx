@@ -358,6 +358,44 @@ export default function Home() {
         </section>
       )}
 
+      {/* Gold Plated Silver Collection */}
+      {goldPlatedSilverProducts.length > 0 && (
+        <section className="py-8" data-testid="section-gold-plated-silver-collection" style={{ background: '#fff8e1' }}>
+          <div className="container mx-auto px-4">
+            <div className="text-center mb-6">
+              <div className="flex items-center justify-center mb-6">
+                <Crown className="h-8 w-8 mr-4" style={{ color: '#b8860b' }} />
+                <h2 className="text-lg sm:text-2xl md:text-4xl font-bold" style={{ color: '#8b4513' }}>Gold Plated Silver Collection</h2>
+                <Crown className="h-8 w-8 ml-4" style={{ color: '#b8860b' }} />
+              </div>
+              <p className="text-sm sm:text-xl text-black">Affordable luxury with gold plated silver</p>
+            </div>
+            <div className="grid grid-cols-3 sm:grid-cols-3 lg:grid-cols-4 gap-2 md:gap-6 mb-8">
+              {goldPlatedSilverProducts.map((product) => (
+                <ProductCard
+                  key={product.id}
+                  product={product}
+                  currency={selectedCurrency}
+                  showActions={true}
+                />
+              ))}
+            </div>
+            <div className="text-center">
+              <Button 
+                variant="outline" 
+                className="border-2 px-8 py-3 text-lg" 
+                style={{ borderColor: '#b8860b', color: '#8b4513' }} 
+                onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#b8860b'; e.currentTarget.style.color = 'white'; }} 
+                onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; e.currentTarget.style.color = '#8b4513'; }}
+                onClick={() => window.location.href = '/collections?material=gold-plated-silver'}
+              >
+                View All Gold Plated Silver <ArrowRight className="ml-2 h-5 w-5" />
+              </Button>
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* Material-Based Sections - Always show these regardless of custom sections */}
       
       {/* Gold Collection */}
@@ -588,43 +626,6 @@ export default function Home() {
         </section>
       )}
 
-      {/* Gold Plated Silver Collection */}
-      {goldPlatedSilverProducts.length > 0 && (
-        <section className="py-8" data-testid="section-gold-plated-silver-collection" style={{ background: 'linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)' }}>
-          <div className="container mx-auto px-4">
-            <div className="text-center mb-12">
-              <div className="flex items-center justify-center mb-6">
-                <Crown className="h-8 w-8 mr-4" style={{ color: '#b8860b' }} />
-                <h2 className="text-lg sm:text-2xl md:text-4xl font-bold" style={{ color: '#8b4513' }}>Gold Plated Silver Collection</h2>
-                <Crown className="h-8 w-8 ml-4" style={{ color: '#b8860b' }} />
-              </div>
-              <p className="text-sm sm:text-xl text-black">Affordable luxury with gold plated silver</p>
-            </div>
-            <div className="grid grid-cols-3 sm:grid-cols-3 lg:grid-cols-4 gap-2 md:gap-6 mb-8">
-              {goldPlatedSilverProducts.map((product) => (
-                <ProductCard
-                  key={product.id}
-                  product={product}
-                  currency={selectedCurrency}
-                  showActions={true}
-                />
-              ))}
-            </div>
-            <div className="text-center">
-              <Button 
-                variant="outline" 
-                className="border-2 px-8 py-3 text-lg" 
-                style={{ borderColor: '#b8860b', color: '#8b4513' }} 
-                onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#b8860b'; e.currentTarget.style.color = 'white'; }} 
-                onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; e.currentTarget.style.color = '#8b4513'; }}
-                onClick={() => window.location.href = '/collections?material=gold-plated-silver'}
-              >
-                View All Gold Plated Silver <ArrowRight className="ml-2 h-5 w-5" />
-              </Button>
-            </div>
-          </div>
-        </section>
-      )}
 
       {/* Other Materials Collection */}
       {otherProducts.length > 0 && (
