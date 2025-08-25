@@ -57,7 +57,7 @@ export default function CollectionsPage({ material, category }: CollectionsPageP
   // Dynamic items per page based on screen size
   const getItemsPerPage = () => {
     if (typeof window !== 'undefined') {
-      return window.innerWidth >= 1280 ? 15 : 6; // Desktop: 5x3=15, Mobile: 3x2=6
+      return window.innerWidth >= 1280 ? 15 : 9; // Desktop: 5x3=15, Mobile: 3x3=9
     }
     return 15;
   };
@@ -698,7 +698,7 @@ export default function CollectionsPage({ material, category }: CollectionsPageP
                     </p>
                   </div>
 
-                  <div className="grid grid-cols-3 gap-0.5 sm:gap-2 md:gap-4 lg:grid-cols-4 xl:grid-cols-5 xl:gap-6 items-start" data-testid="grid-products">
+                  <div className="grid grid-cols-3 gap-1 sm:gap-2 md:gap-4 lg:grid-cols-4 xl:grid-cols-5 xl:gap-6 items-start" data-testid="grid-products">
                     {paginatedProducts.map((product) => (
                       <ProductCard
                         key={product.id}
