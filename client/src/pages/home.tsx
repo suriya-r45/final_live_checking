@@ -322,7 +322,7 @@ export default function Home() {
 
       {/* New Arrivals */}
       {newArrivalProducts.length > 0 && (
-        <section className="py-16" data-testid="section-new-arrivals" style={{ background: 'linear-gradient(135deg, #fef3c7 0%, #fed7aa 100%)' }}>
+        <section className="py-16" data-testid="section-new-arrivals" style={{ background: '#fff8e1' }}>
           <div className="container mx-auto px-4">
             <div className="text-center mb-12">
               <div className="flex items-center justify-center mb-6">
@@ -362,7 +362,7 @@ export default function Home() {
       
       {/* Gold Collection */}
       {goldProducts.length > 0 && (
-        <section className="py-16" data-testid="section-gold-collection" style={{ background: 'linear-gradient(135deg, #fef3c7 0%, #fed7aa 100%)' }}>
+        <section className="py-16" data-testid="section-gold-collection" style={{ background: '#fff8e1' }}>
           <div className="container mx-auto px-4">
             <div className="text-center mb-12">
               <div className="flex items-center justify-center mb-6">
@@ -400,7 +400,7 @@ export default function Home() {
 
       {/* Silver Collection */}
       {silverProducts.length > 0 && (
-        <section className="py-16" data-testid="section-silver-collection" style={{ background: 'linear-gradient(135deg, #fef3c7 0%, #fed7aa 100%)' }}>
+        <section className="py-16" data-testid="section-silver-collection" style={{ background: '#fff8e1' }}>
           <div className="container mx-auto px-4">
             <div className="text-center mb-12">
               <div className="flex items-center justify-center mb-6">
@@ -438,7 +438,7 @@ export default function Home() {
 
       {/* Diamond Collection */}
       {diamondProducts.length > 0 && (
-        <section className="py-16" data-testid="section-diamond-collection" style={{ background: 'linear-gradient(135deg, #fef3c7 0%, #fed7aa 100%)' }}>
+        <section className="py-16" data-testid="section-diamond-collection" style={{ background: '#fff8e1' }}>
           <div className="container mx-auto px-4">
             <div className="text-center mb-12">
               <div className="flex items-center justify-center mb-6">
@@ -476,7 +476,7 @@ export default function Home() {
 
       {/* Platinum Collection */}
       {platinumProducts.length > 0 && (
-        <section className="py-16" data-testid="section-platinum-collection" style={{ background: 'linear-gradient(135deg, #fef3c7 0%, #fed7aa 100%)' }}>
+        <section className="py-16" data-testid="section-platinum-collection" style={{ background: '#fff8e1' }}>
           <div className="container mx-auto px-4">
             <div className="text-center mb-12">
               <div className="flex items-center justify-center mb-6">
@@ -514,7 +514,7 @@ export default function Home() {
 
       {/* Gemstone Collection */}
       {gemstoneProducts.length > 0 && (
-        <section className="py-16" data-testid="section-gemstone-collection" style={{ background: 'linear-gradient(135deg, #fef3c7 0%, #fed7aa 100%)' }}>
+        <section className="py-16" data-testid="section-gemstone-collection" style={{ background: '#fff8e1' }}>
           <div className="container mx-auto px-4">
             <div className="text-center mb-12">
               <div className="flex items-center justify-center mb-6">
@@ -552,7 +552,7 @@ export default function Home() {
 
       {/* Pearl Collection */}
       {pearlProducts.length > 0 && (
-        <section className="py-16" data-testid="section-pearl-collection" style={{ background: 'linear-gradient(135deg, #fef3c7 0%, #fed7aa 100%)' }}>
+        <section className="py-16" data-testid="section-pearl-collection" style={{ background: '#fff8e1' }}>
           <div className="container mx-auto px-4">
             <div className="text-center mb-12">
               <div className="flex items-center justify-center mb-6">
@@ -562,7 +562,7 @@ export default function Home() {
               </div>
               <p className="text-sm sm:text-xl text-black">Timeless pearls for classic beauty</p>
             </div>
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 md:gap-6 mb-8">
+            <div className="grid grid-cols-3 sm:grid-cols-3 lg:grid-cols-4 gap-2 md:gap-6 mb-8">
               {pearlProducts.map((product) => (
                 <ProductCard
                   key={product.id}
@@ -590,7 +590,7 @@ export default function Home() {
 
       {/* Gold Plated Silver Collection */}
       {goldPlatedSilverProducts.length > 0 && (
-        <section className="py-16" data-testid="section-gold-plated-silver-collection" style={{ background: 'linear-gradient(135deg, #fef3c7 0%, #fed7aa 100%)' }}>
+        <section className="py-16" data-testid="section-gold-plated-silver-collection" style={{ background: '#fff8e1' }}>
           <div className="container mx-auto px-4">
             <div className="text-center mb-12">
               <div className="flex items-center justify-center mb-6">
@@ -600,7 +600,7 @@ export default function Home() {
               </div>
               <p className="text-sm sm:text-xl text-black">Affordable luxury with gold plated silver</p>
             </div>
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 md:gap-6 mb-8">
+            <div className="grid grid-cols-3 sm:grid-cols-3 lg:grid-cols-4 gap-2 md:gap-6 mb-8">
               {goldPlatedSilverProducts.map((product) => (
                 <ProductCard
                   key={product.id}
@@ -628,7 +628,7 @@ export default function Home() {
 
       {/* Other Materials Collection */}
       {otherProducts.length > 0 && (
-        <section className="py-16" data-testid="section-other-collection" style={{ background: 'linear-gradient(135deg, #fef3c7 0%, #fed7aa 100%)' }}>
+        <section className="py-16" data-testid="section-other-collection" style={{ background: '#fff8e1' }}>
           <div className="container mx-auto px-4">
             <div className="text-center mb-12">
               <div className="flex items-center justify-center mb-6">
@@ -638,7 +638,7 @@ export default function Home() {
               </div>
               <p className="text-sm sm:text-xl text-black">Unique materials for distinctive styles</p>
             </div>
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 md:gap-6 mb-8">
+            <div className="grid grid-cols-3 sm:grid-cols-3 lg:grid-cols-4 gap-2 md:gap-6 mb-8">
               {otherProducts.map((product) => (
                 <ProductCard
                   key={product.id}
