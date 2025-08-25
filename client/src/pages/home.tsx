@@ -590,7 +590,7 @@ export default function Home() {
 
       {/* Gold Plated Silver Collection */}
       {goldPlatedSilverProducts.length > 0 && (
-        <section className="py-8" data-testid="section-gold-plated-silver-collection" style={{ background: 'linear-gradient(135deg, #fef9e7 0%, #fbbf24 100%)' }}>
+        <section className="py-8" data-testid="section-gold-plated-silver-collection" style={{ background: 'linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)' }}>
           <div className="container mx-auto px-4">
             <div className="text-center mb-12">
               <div className="flex items-center justify-center mb-6">
