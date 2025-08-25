@@ -57,7 +57,7 @@ export default function CollectionsPage({ material, category }: CollectionsPageP
   // Dynamic items per page based on screen size
   const getItemsPerPage = () => {
     if (typeof window !== 'undefined') {
-      return window.innerWidth >= 1280 ? 15 : 15; // Desktop: 5x3=15, Mobile: 3x5=15
+      return window.innerWidth >= 1280 ? 15 : 12; // Desktop: 5x3=15, Mobile: 3x4=12
     }
     return 15;
   };
