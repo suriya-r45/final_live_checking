@@ -108,7 +108,7 @@ export function EstimatesList() {
   // Mutation to send estimate to WhatsApp
   const sendToWhatsAppMutation = useMutation({
     mutationFn: async (estimateId: string) => {
-      return apiRequest(`/api/estimates/${estimateId}/whatsapp`, {
+      return apiRequest(`/api/estimates/${estimateId}/send-whatsapp`, {
         method: 'POST',
       });
     },
