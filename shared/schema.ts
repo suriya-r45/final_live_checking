@@ -223,6 +223,253 @@ export type CartItem = {
   product: Product;
 };
 
+// Shipping and Logistics Types
+export type PackageDimensions = {
+  length: number; // in cm
+  width: number;  // in cm
+  height: number; // in cm
+};
+
+export type TrackingEvent = {
+  id: string;
+  timestamp: string;
+  status: string;
+  location: string;
+  description: string;
+  carrierStatus?: string;
+};
+
+export type ShippingZone = {
+  id: string;
+  name: string;
+  countries: string[];
+  isActive: boolean;
+  createdAt: Date;
+};
+
+export type ShippingMethod = {
+  id: string;
+  zoneId: string;
+  name: string;
+  description?: string;
+  carrier?: string;
+  estimatedDays: number;
+  maxDays?: number;
+  baseCost: string;
+  perKgCost: string;
+  freeShippingThreshold?: string;
+  currency: string;
+  trackingAvailable: boolean;
+  signatureRequired: boolean;
+  insuranceIncluded: boolean;
+  maxWeight?: string;
+  isActive: boolean;
+  createdAt: Date;
+};
+
+export type Shipment = {
+  id: string;
+  orderId: string;
+  trackingNumber?: string;
+  carrier: string;
+  shippingMethodId: string;
+  senderName: string;
+  senderAddress: string;
+  senderCity: string;
+  senderState: string;
+  senderCountry: string;
+  senderPostalCode: string;
+  senderPhone: string;
+  recipientName: string;
+  recipientAddress: string;
+  recipientCity: string;
+  recipientState: string;
+  recipientCountry: string;
+  recipientPostalCode: string;
+  recipientPhone: string;
+  recipientEmail?: string;
+  packageWeight: string;
+  packageDimensions?: PackageDimensions;
+  packageValue: string;
+  packageCurrency: string;
+  itemsDescription: string;
+  isFragile: boolean;
+  requiresSignature: boolean;
+  shippingCost: string;
+  insuranceCost: string;
+  totalCost: string;
+  status: string;
+  estimatedDeliveryDate?: Date;
+  actualDeliveryDate?: Date;
+  trackingEvents: TrackingEvent[];
+  lastTrackingUpdate?: Date;
+  notes?: string;
+  specialInstructions?: string;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
+export type DeliveryAttempt = {
+  id: string;
+  shipmentId: string;
+  attemptNumber: number;
+  attemptDate: Date;
+  status: string;
+  reason?: string;
+  notes?: string;
+  nextAttemptDate?: Date;
+  deliveredTo?: string;
+  signature?: string;
+  photoProof?: string;
+  createdAt: Date;
+};
+
+// Shipping and Logistics Tables
+
+// Shipping Zones Table
+export const shippingZones = pgTable("shipping_zones", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  name: text("name").notNull(), // "Domestic India", "Bahrain", "International"
+  countries: jsonb("countries").$type<string[]>().notNull(), // ["IN"], ["BH"], ["US", "CA", "UK"]
+  isActive: boolean("is_active").notNull().default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Shipping Methods Table
+export const shippingMethods = pgTable("shipping_methods", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  zoneId: varchar("zone_id").notNull(),
+  name: text("name").notNull(), // "Standard Delivery", "Express Delivery", "Premium Insured"
+  description: text("description"),
+  carrier: text("carrier"), // "Blue Dart", "Aramex", "DHL", "FedEx"
+  estimatedDays: integer("estimated_days").notNull(), // 3-5 days
+  maxDays: integer("max_days"), // 7 days maximum
+  baseCost: decimal("base_cost", { precision: 10, scale: 2 }).notNull(),
+  perKgCost: decimal("per_kg_cost", { precision: 10, scale: 2 }).default("0"),
+  freeShippingThreshold: decimal("free_shipping_threshold", { precision: 10, scale: 2 }),
+  currency: text("currency").default("INR"),
+  trackingAvailable: boolean("tracking_available").default(true),
+  signatureRequired: boolean("signature_required").default(false),
+  insuranceIncluded: boolean("insurance_included").default(false),
+  maxWeight: decimal("max_weight", { precision: 8, scale: 2 }), // in kg
+  isActive: boolean("is_active").notNull().default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Shipments Table
+export const shipments = pgTable("shipments", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  orderId: uuid("order_id").notNull(),
+  trackingNumber: text("tracking_number").unique(),
+  carrier: text("carrier").notNull(),
+  shippingMethodId: varchar("shipping_method_id").notNull(),
+  
+  // Sender Information
+  senderName: text("sender_name").notNull().default("Palaniappa Jewellers"),
+  senderAddress: text("sender_address").notNull(),
+  senderCity: text("sender_city").notNull(),
+  senderState: text("sender_state").notNull(),
+  senderCountry: text("sender_country").notNull(),
+  senderPostalCode: text("sender_postal_code").notNull(),
+  senderPhone: text("sender_phone").notNull(),
+  
+  // Recipient Information
+  recipientName: text("recipient_name").notNull(),
+  recipientAddress: text("recipient_address").notNull(),
+  recipientCity: text("recipient_city").notNull(),
+  recipientState: text("recipient_state").notNull(),
+  recipientCountry: text("recipient_country").notNull(),
+  recipientPostalCode: text("recipient_postal_code").notNull(),
+  recipientPhone: text("recipient_phone").notNull(),
+  recipientEmail: text("recipient_email"),
+  
+  // Package Information
+  packageWeight: decimal("package_weight", { precision: 8, scale: 3 }).notNull(), // in kg
+  packageDimensions: jsonb("package_dimensions").$type<PackageDimensions>(),
+  packageValue: decimal("package_value", { precision: 10, scale: 2 }).notNull(),
+  packageCurrency: text("package_currency").default("INR"),
+  itemsDescription: text("items_description").notNull(),
+  isFragile: boolean("is_fragile").default(true), // Jewelry is fragile
+  requiresSignature: boolean("requires_signature").default(true),
+  
+  // Shipping Costs
+  shippingCost: decimal("shipping_cost", { precision: 10, scale: 2 }).notNull(),
+  insuranceCost: decimal("insurance_cost", { precision: 10, scale: 2 }).default("0"),
+  totalCost: decimal("total_cost", { precision: 10, scale: 2 }).notNull(),
+  
+  // Status and Dates
+  status: text("status").notNull().default("CREATED"), // CREATED, PICKUP_SCHEDULED, PICKED_UP, IN_TRANSIT, OUT_FOR_DELIVERY, DELIVERED, RETURNED, LOST
+  estimatedDeliveryDate: timestamp("estimated_delivery_date"),
+  actualDeliveryDate: timestamp("actual_delivery_date"),
+  
+  // Tracking Information
+  trackingEvents: jsonb("tracking_events").$type<TrackingEvent[]>().default(sql`'[]'::jsonb`),
+  lastTrackingUpdate: timestamp("last_tracking_update"),
+  
+  // Additional Information
+  notes: text("notes"),
+  specialInstructions: text("special_instructions"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Delivery Attempts Table
+export const deliveryAttempts = pgTable("delivery_attempts", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  shipmentId: varchar("shipment_id").notNull(),
+  attemptNumber: integer("attempt_number").notNull(),
+  attemptDate: timestamp("attempt_date").notNull(),
+  status: text("status").notNull(), // SUCCESSFUL, FAILED, RESCHEDULED
+  reason: text("reason"), // "Customer not available", "Incorrect address", etc.
+  notes: text("notes"),
+  nextAttemptDate: timestamp("next_attempt_date"),
+  deliveredTo: text("delivered_to"), // If successful, who received it
+  signature: text("signature"), // Base64 encoded signature if available
+  photoProof: text("photo_proof"), // URL to delivery photo
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Shipping Relations
+export const shippingZonesRelations = relations(shippingZones, ({ many }) => ({
+  methods: many(shippingMethods),
+}));
+
+export const shippingMethodsRelations = relations(shippingMethods, ({ one, many }) => ({
+  zone: one(shippingZones, {
+    fields: [shippingMethods.zoneId],
+    references: [shippingZones.id],
+  }),
+  shipments: many(shipments),
+}));
+
+export const shipmentsRelations = relations(shipments, ({ one, many }) => ({
+  order: one(orders, {
+    fields: [shipments.orderId],
+    references: [orders.id],
+  }),
+  shippingMethod: one(shippingMethods, {
+    fields: [shipments.shippingMethodId],
+    references: [shippingMethods.id],
+  }),
+  deliveryAttempts: many(deliveryAttempts),
+}));
+
+export const deliveryAttemptsRelations = relations(deliveryAttempts, ({ one }) => ({
+  shipment: one(shipments, {
+    fields: [deliveryAttempts.shipmentId],
+    references: [shipments.id],
+  }),
+}));
+
+// Update orders relations to include shipments
+export const ordersRelationsUpdated = relations(orders, ({ one, many }) => ({
+  customer: one(users, {
+    fields: [orders.customerEmail],
+    references: [users.email],
+  }),
+  shipments: many(shipments),
+}));
+
 // Categories Management Table
 export const categories = pgTable("categories", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
@@ -673,3 +920,48 @@ export type Category = typeof categories.$inferSelect;
 export type HomeSection = typeof homeSections.$inferSelect;
 export type HomeSectionItem = typeof homeSectionItems.$inferSelect;
 export type CartItemRow = typeof cartItems.$inferSelect;
+
+// Shipping Zod Schemas
+export const insertShippingZoneSchema = createInsertSchema(shippingZones).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertShippingMethodSchema = createInsertSchema(shippingMethods).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertShipmentSchema = createInsertSchema(shipments).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertDeliveryAttemptSchema = createInsertSchema(deliveryAttempts).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const updateShipmentStatusSchema = z.object({
+  status: z.string(),
+  trackingEvents: z.array(z.object({
+    id: z.string(),
+    timestamp: z.string(),
+    status: z.string(),
+    location: z.string(),
+    description: z.string(),
+    carrierStatus: z.string().optional(),
+  })).optional(),
+  estimatedDeliveryDate: z.coerce.date().optional(),
+  actualDeliveryDate: z.coerce.date().optional(),
+  notes: z.string().optional(),
+});
+
+export const calculateShippingSchema = z.object({
+  recipientCountry: z.string(),
+  packageWeight: z.number(),
+  packageValue: z.number(),
+  currency: z.enum(["INR", "BHD"]),
+  isExpress: z.boolean().default(false),
+});

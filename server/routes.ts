@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertProductSchema, insertBillSchema, loginSchema, insertUserSchema, insertEstimateSchema, insertCategorySchema, updateCategorySchema, insertHomeSectionSchema, insertHomeSectionItemSchema } from "@shared/schema";
+import { insertProductSchema, insertBillSchema, loginSchema, insertUserSchema, insertEstimateSchema, insertCategorySchema, updateCategorySchema, insertHomeSectionSchema, insertHomeSectionItemSchema, insertShippingZoneSchema, insertShippingMethodSchema, insertShipmentSchema, insertDeliveryAttemptSchema, updateShipmentStatusSchema, calculateShippingSchema } from "@shared/schema";
 import { z } from "zod";
 import multer from "multer";
 import path from "path";
@@ -1706,6 +1706,292 @@ For any queries, please contact us.`;
   });
 
   // === END HOME SECTIONS MANAGEMENT ROUTES ===
+
+  // === SHIPPING & LOGISTICS API ROUTES ===
+
+  // Shipping Zones
+  app.get("/api/shipping/zones", async (req, res) => {
+    try {
+      const zones = await storage.getAllShippingZones();
+      res.json(zones);
+    } catch (error) {
+      console.error('Error fetching shipping zones:', error);
+      res.status(500).json({ error: 'Failed to fetch shipping zones' });
+    }
+  });
+
+  app.post("/api/shipping/zones", authenticateToken, requireAdmin, async (req, res) => {
+    try {
+      const validatedData = insertShippingZoneSchema.parse(req.body);
+      const zone = await storage.createShippingZone(validatedData);
+      res.status(201).json(zone);
+    } catch (error) {
+      console.error('Error creating shipping zone:', error);
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ error: 'Invalid data', details: error.errors });
+      }
+      res.status(500).json({ error: 'Failed to create shipping zone' });
+    }
+  });
+
+  app.put("/api/shipping/zones/:id", authenticateToken, requireAdmin, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const validatedData = insertShippingZoneSchema.partial().parse(req.body);
+      const zone = await storage.updateShippingZone(id, validatedData);
+      if (!zone) {
+        return res.status(404).json({ error: 'Shipping zone not found' });
+      }
+      res.json(zone);
+    } catch (error) {
+      console.error('Error updating shipping zone:', error);
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ error: 'Invalid data', details: error.errors });
+      }
+      res.status(500).json({ error: 'Failed to update shipping zone' });
+    }
+  });
+
+  app.delete("/api/shipping/zones/:id", authenticateToken, requireAdmin, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const success = await storage.deleteShippingZone(id);
+      if (!success) {
+        return res.status(404).json({ error: 'Shipping zone not found' });
+      }
+      res.json({ message: 'Shipping zone deleted successfully' });
+    } catch (error) {
+      console.error('Error deleting shipping zone:', error);
+      res.status(500).json({ error: 'Failed to delete shipping zone' });
+    }
+  });
+
+  // Shipping Methods
+  app.get("/api/shipping/methods", async (req, res) => {
+    try {
+      const { zoneId, country } = req.query;
+      
+      let methods;
+      if (zoneId) {
+        methods = await storage.getShippingMethodsByZone(zoneId as string);
+      } else if (country) {
+        methods = await storage.getShippingMethodsByCountry(country as string);
+      } else {
+        methods = await storage.getAllShippingMethods();
+      }
+      
+      res.json(methods);
+    } catch (error) {
+      console.error('Error fetching shipping methods:', error);
+      res.status(500).json({ error: 'Failed to fetch shipping methods' });
+    }
+  });
+
+  app.post("/api/shipping/methods", authenticateToken, requireAdmin, async (req, res) => {
+    try {
+      const validatedData = insertShippingMethodSchema.parse(req.body);
+      const method = await storage.createShippingMethod(validatedData);
+      res.status(201).json(method);
+    } catch (error) {
+      console.error('Error creating shipping method:', error);
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ error: 'Invalid data', details: error.errors });
+      }
+      res.status(500).json({ error: 'Failed to create shipping method' });
+    }
+  });
+
+  app.put("/api/shipping/methods/:id", authenticateToken, requireAdmin, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const validatedData = insertShippingMethodSchema.partial().parse(req.body);
+      const method = await storage.updateShippingMethod(id, validatedData);
+      if (!method) {
+        return res.status(404).json({ error: 'Shipping method not found' });
+      }
+      res.json(method);
+    } catch (error) {
+      console.error('Error updating shipping method:', error);
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ error: 'Invalid data', details: error.errors });
+      }
+      res.status(500).json({ error: 'Failed to update shipping method' });
+    }
+  });
+
+  app.delete("/api/shipping/methods/:id", authenticateToken, requireAdmin, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const success = await storage.deleteShippingMethod(id);
+      if (!success) {
+        return res.status(404).json({ error: 'Shipping method not found' });
+      }
+      res.json({ message: 'Shipping method deleted successfully' });
+    } catch (error) {
+      console.error('Error deleting shipping method:', error);
+      res.status(500).json({ error: 'Failed to delete shipping method' });
+    }
+  });
+
+  // Shipping Cost Calculation
+  app.post("/api/shipping/calculate", async (req, res) => {
+    try {
+      const validatedData = calculateShippingSchema.parse(req.body);
+      const { recipientCountry, packageWeight, packageValue, currency } = validatedData;
+      
+      const result = await storage.calculateShippingCost(recipientCountry, packageWeight, packageValue, currency);
+      res.json(result);
+    } catch (error) {
+      console.error('Error calculating shipping cost:', error);
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ error: 'Invalid data', details: error.errors });
+      }
+      res.status(500).json({ error: 'Failed to calculate shipping cost' });
+    }
+  });
+
+  // Shipments
+  app.get("/api/shipments", authenticateToken, async (req, res) => {
+    try {
+      const { orderId, trackingNumber } = req.query;
+      
+      let shipments;
+      if (orderId) {
+        shipments = await storage.getShipmentsByOrder(orderId as string);
+      } else if (trackingNumber) {
+        const shipment = await storage.getShipmentByTrackingNumber(trackingNumber as string);
+        shipments = shipment ? [shipment] : [];
+      } else {
+        shipments = await storage.getAllShipments();
+      }
+      
+      res.json(shipments);
+    } catch (error) {
+      console.error('Error fetching shipments:', error);
+      res.status(500).json({ error: 'Failed to fetch shipments' });
+    }
+  });
+
+  app.get("/api/shipments/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const shipment = await storage.getShipment(id);
+      if (!shipment) {
+        return res.status(404).json({ error: 'Shipment not found' });
+      }
+      res.json(shipment);
+    } catch (error) {
+      console.error('Error fetching shipment:', error);
+      res.status(500).json({ error: 'Failed to fetch shipment' });
+    }
+  });
+
+  app.post("/api/shipments", authenticateToken, requireAdmin, async (req, res) => {
+    try {
+      const validatedData = insertShipmentSchema.parse(req.body);
+      const shipment = await storage.createShipment(validatedData);
+      res.status(201).json(shipment);
+    } catch (error) {
+      console.error('Error creating shipment:', error);
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ error: 'Invalid data', details: error.errors });
+      }
+      res.status(500).json({ error: 'Failed to create shipment' });
+    }
+  });
+
+  app.put("/api/shipments/:id/status", authenticateToken, requireAdmin, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const validatedData = updateShipmentStatusSchema.parse(req.body);
+      const { status, trackingEvents, estimatedDeliveryDate, actualDeliveryDate, notes } = validatedData;
+      
+      let shipment = await storage.updateShipmentStatus(id, status, trackingEvents);
+      
+      if (estimatedDeliveryDate || actualDeliveryDate || notes) {
+        const updateData: any = {};
+        if (estimatedDeliveryDate) updateData.estimatedDeliveryDate = estimatedDeliveryDate;
+        if (actualDeliveryDate) updateData.actualDeliveryDate = actualDeliveryDate;
+        if (notes) updateData.notes = notes;
+        
+        shipment = await storage.updateShipment(id, updateData);
+      }
+      
+      if (!shipment) {
+        return res.status(404).json({ error: 'Shipment not found' });
+      }
+      res.json(shipment);
+    } catch (error) {
+      console.error('Error updating shipment status:', error);
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ error: 'Invalid data', details: error.errors });
+      }
+      res.status(500).json({ error: 'Failed to update shipment status' });
+    }
+  });
+
+  // Public tracking endpoint (no authentication required)
+  app.get("/api/track/:trackingNumber", async (req, res) => {
+    try {
+      const { trackingNumber } = req.params;
+      const shipment = await storage.getShipmentByTrackingNumber(trackingNumber);
+      
+      if (!shipment) {
+        return res.status(404).json({ error: 'Tracking number not found' });
+      }
+      
+      // Return limited tracking information for public access
+      const publicTrackingInfo = {
+        trackingNumber: shipment.trackingNumber,
+        status: shipment.status,
+        carrier: shipment.carrier,
+        estimatedDeliveryDate: shipment.estimatedDeliveryDate,
+        actualDeliveryDate: shipment.actualDeliveryDate,
+        trackingEvents: shipment.trackingEvents,
+        lastTrackingUpdate: shipment.lastTrackingUpdate,
+        recipientCity: shipment.recipientCity,
+        recipientState: shipment.recipientState,
+        recipientCountry: shipment.recipientCountry,
+      };
+      
+      res.json(publicTrackingInfo);
+    } catch (error) {
+      console.error('Error tracking shipment:', error);
+      res.status(500).json({ error: 'Failed to track shipment' });
+    }
+  });
+
+  // Delivery Attempts
+  app.get("/api/shipments/:shipmentId/delivery-attempts", authenticateToken, async (req, res) => {
+    try {
+      const { shipmentId } = req.params;
+      const attempts = await storage.getDeliveryAttempts(shipmentId);
+      res.json(attempts);
+    } catch (error) {
+      console.error('Error fetching delivery attempts:', error);
+      res.status(500).json({ error: 'Failed to fetch delivery attempts' });
+    }
+  });
+
+  app.post("/api/shipments/:shipmentId/delivery-attempts", authenticateToken, requireAdmin, async (req, res) => {
+    try {
+      const { shipmentId } = req.params;
+      const validatedData = insertDeliveryAttemptSchema.parse({
+        ...req.body,
+        shipmentId
+      });
+      const attempt = await storage.createDeliveryAttempt(validatedData);
+      res.status(201).json(attempt);
+    } catch (error) {
+      console.error('Error creating delivery attempt:', error);
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ error: 'Invalid data', details: error.errors });
+      }
+      res.status(500).json({ error: 'Failed to create delivery attempt' });
+    }
+  });
+
+  // === END SHIPPING & LOGISTICS API ROUTES ===
 
   // Static file serving for uploads
   app.use('/uploads', (req, res, next) => {

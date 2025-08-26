@@ -1,4 +1,4 @@
-import { users, products, bills, cartItems, orders, estimates, categories, homeSections, homeSectionItems, type User, type InsertUser, type Product, type InsertProduct, type Bill, type InsertBill, type CartItemRow, type InsertCartItem, type Order, type InsertOrder, type CartItem, type Estimate, type InsertEstimate, type Category, type InsertCategory, type HomeSection, type InsertHomeSection, type HomeSectionItem, type InsertHomeSectionItem } from "@shared/schema";
+import { users, products, bills, cartItems, orders, estimates, categories, homeSections, homeSectionItems, shippingZones, shippingMethods, shipments, deliveryAttempts, type User, type InsertUser, type Product, type InsertProduct, type Bill, type InsertBill, type CartItemRow, type InsertCartItem, type Order, type InsertOrder, type CartItem, type Estimate, type InsertEstimate, type Category, type InsertCategory, type HomeSection, type InsertHomeSection, type HomeSectionItem, type InsertHomeSectionItem, type ShippingZone, type ShippingMethod, type Shipment, type DeliveryAttempt } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, like, and, gte, lte, isNull, or } from "drizzle-orm";
 import bcrypt from "bcryptjs";
@@ -85,6 +85,39 @@ export interface IStorage {
   addHomeSectionItem(item: InsertHomeSectionItem): Promise<HomeSectionItem>;
   updateHomeSectionItem(itemId: string, item: Partial<InsertHomeSectionItem>): Promise<HomeSectionItem | undefined>;
   deleteHomeSectionItem(itemId: string): Promise<boolean>;
+
+  // Shipping Zone operations
+  getAllShippingZones(): Promise<ShippingZone[]>;
+  getShippingZone(id: string): Promise<ShippingZone | undefined>;
+  createShippingZone(zone: Partial<ShippingZone>): Promise<ShippingZone>;
+  updateShippingZone(id: string, zone: Partial<ShippingZone>): Promise<ShippingZone | undefined>;
+  deleteShippingZone(id: string): Promise<boolean>;
+
+  // Shipping Method operations
+  getAllShippingMethods(): Promise<ShippingMethod[]>;
+  getShippingMethodsByZone(zoneId: string): Promise<ShippingMethod[]>;
+  getShippingMethodsByCountry(country: string): Promise<ShippingMethod[]>;
+  getShippingMethod(id: string): Promise<ShippingMethod | undefined>;
+  createShippingMethod(method: Partial<ShippingMethod>): Promise<ShippingMethod>;
+  updateShippingMethod(id: string, method: Partial<ShippingMethod>): Promise<ShippingMethod | undefined>;
+  deleteShippingMethod(id: string): Promise<boolean>;
+
+  // Shipment operations
+  getAllShipments(): Promise<Shipment[]>;
+  getShipment(id: string): Promise<Shipment | undefined>;
+  getShipmentByTrackingNumber(trackingNumber: string): Promise<Shipment | undefined>;
+  getShipmentsByOrder(orderId: string): Promise<Shipment[]>;
+  createShipment(shipment: Partial<Shipment>): Promise<Shipment>;
+  updateShipment(id: string, shipment: Partial<Shipment>): Promise<Shipment | undefined>;
+  updateShipmentStatus(id: string, status: string, trackingEvents?: any[]): Promise<Shipment | undefined>;
+
+  // Delivery Attempt operations
+  getDeliveryAttempts(shipmentId: string): Promise<DeliveryAttempt[]>;
+  createDeliveryAttempt(attempt: Partial<DeliveryAttempt>): Promise<DeliveryAttempt>;
+  updateDeliveryAttempt(id: string, attempt: Partial<DeliveryAttempt>): Promise<DeliveryAttempt | undefined>;
+
+  // Shipping Calculation
+  calculateShippingCost(country: string, weight: number, value: number, currency: string): Promise<{cost: number, methods: ShippingMethod[]}>;
 }
 
 export interface CategoryWithChildren extends Category {
@@ -682,6 +715,188 @@ export class DatabaseStorage implements IStorage {
   async deleteHomeSectionItem(itemId: string): Promise<boolean> {
     const result = await db.delete(homeSectionItems).where(eq(homeSectionItems.id, itemId));
     return (result.rowCount || 0) > 0;
+  }
+
+  // Shipping Zone operations
+  async getAllShippingZones(): Promise<ShippingZone[]> {
+    return await db.select().from(shippingZones).where(eq(shippingZones.isActive, true));
+  }
+
+  async getShippingZone(id: string): Promise<ShippingZone | undefined> {
+    const [zone] = await db.select().from(shippingZones).where(eq(shippingZones.id, id));
+    return zone || undefined;
+  }
+
+  async createShippingZone(zone: Partial<ShippingZone>): Promise<ShippingZone> {
+    const [newZone] = await db.insert(shippingZones).values(zone as any).returning();
+    return newZone;
+  }
+
+  async updateShippingZone(id: string, zone: Partial<ShippingZone>): Promise<ShippingZone | undefined> {
+    const [updatedZone] = await db.update(shippingZones)
+      .set(zone as any)
+      .where(eq(shippingZones.id, id))
+      .returning();
+    return updatedZone || undefined;
+  }
+
+  async deleteShippingZone(id: string): Promise<boolean> {
+    const result = await db.delete(shippingZones).where(eq(shippingZones.id, id));
+    return (result.rowCount || 0) > 0;
+  }
+
+  // Shipping Method operations
+  async getAllShippingMethods(): Promise<ShippingMethod[]> {
+    return await db.select().from(shippingMethods).where(eq(shippingMethods.isActive, true));
+  }
+
+  async getShippingMethodsByZone(zoneId: string): Promise<ShippingMethod[]> {
+    return await db.select().from(shippingMethods)
+      .where(and(eq(shippingMethods.zoneId, zoneId), eq(shippingMethods.isActive, true)));
+  }
+
+  async getShippingMethodsByCountry(country: string): Promise<ShippingMethod[]> {
+    const zones = await db.select().from(shippingZones).where(eq(shippingZones.isActive, true));
+    const matchingZones = zones.filter(zone => 
+      zone.countries && Array.isArray(zone.countries) && zone.countries.includes(country)
+    );
+    
+    if (matchingZones.length === 0) return [];
+    
+    const zoneIds = matchingZones.map(zone => zone.id);
+    return await db.select().from(shippingMethods)
+      .where(and(
+        eq(shippingMethods.isActive, true),
+        or(...zoneIds.map(id => eq(shippingMethods.zoneId, id)))
+      ));
+  }
+
+  async getShippingMethod(id: string): Promise<ShippingMethod | undefined> {
+    const [method] = await db.select().from(shippingMethods).where(eq(shippingMethods.id, id));
+    return method || undefined;
+  }
+
+  async createShippingMethod(method: Partial<ShippingMethod>): Promise<ShippingMethod> {
+    const [newMethod] = await db.insert(shippingMethods).values(method as any).returning();
+    return newMethod;
+  }
+
+  async updateShippingMethod(id: string, method: Partial<ShippingMethod>): Promise<ShippingMethod | undefined> {
+    const [updatedMethod] = await db.update(shippingMethods)
+      .set(method as any)
+      .where(eq(shippingMethods.id, id))
+      .returning();
+    return updatedMethod || undefined;
+  }
+
+  async deleteShippingMethod(id: string): Promise<boolean> {
+    const result = await db.delete(shippingMethods).where(eq(shippingMethods.id, id));
+    return (result.rowCount || 0) > 0;
+  }
+
+  // Shipment operations
+  async getAllShipments(): Promise<Shipment[]> {
+    return await db.select().from(shipments).orderBy(desc(shipments.createdAt));
+  }
+
+  async getShipment(id: string): Promise<Shipment | undefined> {
+    const [shipment] = await db.select().from(shipments).where(eq(shipments.id, id));
+    return shipment || undefined;
+  }
+
+  async getShipmentByTrackingNumber(trackingNumber: string): Promise<Shipment | undefined> {
+    const [shipment] = await db.select().from(shipments).where(eq(shipments.trackingNumber, trackingNumber));
+    return shipment || undefined;
+  }
+
+  async getShipmentsByOrder(orderId: string): Promise<Shipment[]> {
+    return await db.select().from(shipments).where(eq(shipments.orderId, orderId));
+  }
+
+  async createShipment(shipment: Partial<Shipment>): Promise<Shipment> {
+    if (!shipment.trackingNumber) {
+      const timestamp = Date.now().toString().slice(-8);
+      const random = Math.random().toString(36).substring(2, 8).toUpperCase();
+      shipment.trackingNumber = `PJ${timestamp}${random}`;
+    }
+
+    const [newShipment] = await db.insert(shipments).values(shipment as any).returning();
+    return newShipment;
+  }
+
+  async updateShipment(id: string, shipment: Partial<Shipment>): Promise<Shipment | undefined> {
+    const [updatedShipment] = await db.update(shipments)
+      .set({ ...shipment, updatedAt: new Date() } as any)
+      .where(eq(shipments.id, id))
+      .returning();
+    return updatedShipment || undefined;
+  }
+
+  async updateShipmentStatus(id: string, status: string, trackingEvents?: any[]): Promise<Shipment | undefined> {
+    const updateData: any = { status, updatedAt: new Date(), lastTrackingUpdate: new Date() };
+    if (trackingEvents) {
+      updateData.trackingEvents = trackingEvents;
+    }
+
+    const [updatedShipment] = await db.update(shipments)
+      .set(updateData)
+      .where(eq(shipments.id, id))
+      .returning();
+    return updatedShipment || undefined;
+  }
+
+  // Delivery Attempt operations
+  async getDeliveryAttempts(shipmentId: string): Promise<DeliveryAttempt[]> {
+    return await db.select().from(deliveryAttempts)
+      .where(eq(deliveryAttempts.shipmentId, shipmentId))
+      .orderBy(desc(deliveryAttempts.attemptDate));
+  }
+
+  async createDeliveryAttempt(attempt: Partial<DeliveryAttempt>): Promise<DeliveryAttempt> {
+    const [newAttempt] = await db.insert(deliveryAttempts).values(attempt as any).returning();
+    return newAttempt;
+  }
+
+  async updateDeliveryAttempt(id: string, attempt: Partial<DeliveryAttempt>): Promise<DeliveryAttempt | undefined> {
+    const [updatedAttempt] = await db.update(deliveryAttempts)
+      .set(attempt as any)
+      .where(eq(deliveryAttempts.id, id))
+      .returning();
+    return updatedAttempt || undefined;
+  }
+
+  // Shipping Calculation
+  async calculateShippingCost(country: string, weight: number, value: number, currency: string): Promise<{cost: number, methods: ShippingMethod[]}> {
+    const methods = await this.getShippingMethodsByCountry(country);
+    
+    const calculatedMethods = methods.map(method => {
+      const baseCost = parseFloat(method.baseCost);
+      const perKgCost = parseFloat(method.perKgCost || "0");
+      const freeThreshold = method.freeShippingThreshold ? parseFloat(method.freeShippingThreshold) : null;
+      
+      let cost = baseCost + (weight * perKgCost);
+      
+      if (freeThreshold && value >= freeThreshold) {
+        cost = 0;
+      }
+      
+      if (method.currency !== currency) {
+        if (method.currency === "INR" && currency === "BHD") {
+          cost = cost * 0.0125;
+        } else if (method.currency === "BHD" && currency === "INR") {
+          cost = cost * 80;
+        }
+      }
+      
+      return { ...method, calculatedCost: cost };
+    });
+    
+    const lowestCost = calculatedMethods.length > 0 ? Math.min(...calculatedMethods.map(m => m.calculatedCost || 0)) : 0;
+    
+    return {
+      cost: lowestCost,
+      methods: calculatedMethods
+    };
   }
 }
 

@@ -74,6 +74,10 @@ app.use("/attached_assets", express.static(path.join(__dirname, "../attached_ass
   await MetalRatesService.initializeRates();
   MetalRatesService.startScheduledUpdates();
 
+  // Initialize shipping data
+  const { initializeShippingData } = await import("./init-shipping.js");
+  await initializeShippingData();
+
   // Start server
   const port = parseInt(process.env.PORT || '5000', 10);
   server.listen(
