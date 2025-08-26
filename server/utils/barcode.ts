@@ -327,7 +327,15 @@ Approx Price: ${data.approxPrice}`;
     
     await QRCode.toFile(imagePath, qrData, {
       width: 200,
-      margin: 2
+      margin: 4,
+      color: {
+        dark: '#000000',  // Black dots
+        light: '#FFFFFF'  // White background
+      },
+      errorCorrectionLevel: 'H', // High error correction for better print quality
+      type: 'png',
+      quality: 0.92,
+      scale: 8  // Higher scale for crisp printing
     });
 
     return `/uploads/qrcodes/${filename}`;
