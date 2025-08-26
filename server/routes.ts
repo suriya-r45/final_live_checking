@@ -1140,6 +1140,43 @@ Premium quality, timeless beauty.`;
         items: orderData.items || [],
       });
 
+      // Create a shipment record for order tracking
+      try {
+        const shipmentData = {
+          orderId: bill.id,
+          carrier: "Blue Dart Express", // Default carrier
+          shippingMethodId: "standard-delivery", // Will need to update this later
+          senderAddress: "Salem Main Store, Tamil Nadu",
+          senderCity: "Salem",
+          senderState: "Tamil Nadu",
+          senderCountry: "India",
+          senderPostalCode: "636001",
+          senderPhone: "+919597201554",
+          recipientName: orderData.customerName,
+          recipientAddress: orderData.customerAddress,
+          recipientCity: "Unknown", // We'll improve this later with better address parsing
+          recipientState: "Unknown",
+          recipientCountry: "India",
+          recipientPostalCode: "000000",
+          recipientPhone: orderData.customerPhone,
+          recipientEmail: orderData.customerEmail,
+          packageWeight: "0.1", // Default 100g for jewelry
+          packageValue: orderData.total.toString(),
+          packageCurrency: orderData.currency || "INR",
+          itemsDescription: orderData.items?.map((item: any) => item.productName).join(", ") || "Jewelry Items",
+          shippingCost: "0", // Free shipping for now
+          insuranceCost: "0",
+          totalCost: "0",
+          status: "CREATED",
+          estimatedDeliveryDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days from now
+        };
+
+        await storage.createShipment(shipmentData);
+      } catch (shipmentError) {
+        console.error("Failed to create shipment for order:", shipmentError);
+        // Don't fail the order creation if shipment creation fails
+      }
+
       res.status(201).json({
         orderNumber: bill.billNumber,
         ...bill
