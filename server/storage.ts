@@ -356,19 +356,14 @@ export class DatabaseStorage implements IStorage {
       .insert(bills)
       .values({
         ...bill,
-        total,
-        created_at: new Date(),
-        updated_at: new Date(),
+        total: total.toString(),
+        createdAt: new Date(),
+        updatedAt: new Date(),
       })
-      .returning(); // No semicolon before this
+      .returning();
 
-    console.log(result);
-
-    // Depending on what .returning() returns, adjust:
-    // If result is an array:
-    // return result[0];
-    // If result is an object:
-    return result as Bill;
+    // Return the first item from the array
+    return result[0] as Bill;
   }
 
 

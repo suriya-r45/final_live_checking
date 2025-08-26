@@ -1123,6 +1123,7 @@ Premium quality, timeless beauty.`;
 
       // For now, create as a bill since we haven't migrated the schema yet
       const bill = await storage.createBill({
+        billNumber: orderNumber,
         customerName: orderData.customerName,
         customerEmail: orderData.customerEmail,
         customerPhone: orderData.customerPhone,
@@ -1149,6 +1150,43 @@ Premium quality, timeless beauty.`;
         message: "Failed to create order",
         details: error.message
       });
+    }
+  });
+
+  // Get all orders (for admin dashboard)
+  app.get("/api/orders", authenticateToken, requireAdmin, async (req, res) => {
+    try {
+      // For now, get bills as orders since they're being used for order storage
+      const bills = await storage.getAllBills();
+      
+      // Transform bills to order format for frontend
+      const orders = bills.map(bill => ({
+        id: bill.id,
+        orderNumber: bill.billNumber,
+        customerName: bill.customerName,
+        customerEmail: bill.customerEmail,
+        customerPhone: bill.customerPhone,
+        customerAddress: bill.customerAddress,
+        currency: bill.currency,
+        subtotal: bill.subtotal,
+        makingCharges: bill.makingCharges,
+        gst: bill.gst,
+        vat: bill.vat,
+        discount: bill.discount,
+        total: bill.total,
+        paidAmount: bill.paidAmount,
+        paymentMethod: bill.paymentMethod,
+        paymentStatus: "PAID", // Default since these are completed orders
+        orderStatus: "CONFIRMED", // Default status
+        items: bill.items,
+        createdAt: bill.createdAt,
+        updatedAt: bill.updatedAt
+      }));
+
+      res.json(orders);
+    } catch (error) {
+      console.error("Error fetching orders:", error);
+      res.status(500).json({ message: "Failed to fetch orders" });
     }
   });
 

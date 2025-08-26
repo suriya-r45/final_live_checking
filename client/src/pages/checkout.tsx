@@ -112,12 +112,71 @@ function CheckoutForm() {
             variant: "destructive",
           });
         } else {
-          clearCart();
-          toast({
-            title: "Payment Successful",
-            description: "Thank you for your purchase!",
-          });
-          setLocation('/order-success');
+          // Create order after successful Stripe payment
+          try {
+            // Calculate totals
+            const subtotal = totalAmount;
+            const makingCharges = subtotal * 0.15; // 15% making charges
+            const gst = subtotal * 0.03; // 3% GST for India
+            const total = subtotal + makingCharges + gst;
+
+            // Prepare order data
+            const orderData = {
+              customerName: customerInfo.name,
+              customerEmail: customerInfo.email,
+              customerPhone: customerInfo.phone,
+              customerAddress: `${customerInfo.address}, ${customerInfo.city}, ${customerInfo.state} ${customerInfo.postalCode}, ${customerInfo.country}`,
+              currency: 'INR',
+              subtotal,
+              makingCharges,
+              gst,
+              vat: 0,
+              discount: 0,
+              total,
+              paidAmount: total,
+              paymentMethod: 'STRIPE',
+              items: items.map(item => ({
+                productId: item.product.id,
+                productName: item.product.name,
+                quantity: item.quantity,
+                priceInr: item.product.priceInr,
+                priceBhd: item.product.priceBhd,
+                grossWeight: item.product.grossWeight,
+                netWeight: item.product.netWeight,
+                makingCharges: (parseFloat(item.product.priceInr) * item.quantity * 0.15).toFixed(2),
+                discount: '0',
+                sgst: (parseFloat(item.product.priceInr) * item.quantity * 0.015).toFixed(2),
+                cgst: (parseFloat(item.product.priceInr) * item.quantity * 0.015).toFixed(2),
+                vat: '0',
+                total: (parseFloat(item.product.priceInr) * item.quantity * 1.18).toFixed(2)
+              }))
+            };
+
+            // Create order in database
+            const response = await apiRequest('/api/orders', {
+              method: 'POST',
+              body: JSON.stringify(orderData)
+            });
+
+            if (response) {
+              clearCart();
+              toast({
+                title: "Payment Successful",
+                description: `Order ${response.orderNumber} created successfully!`,
+              });
+              setLocation('/order-success');
+            }
+          } catch (orderError) {
+            console.error('Failed to create order:', orderError);
+            // Still clear cart since payment was successful
+            clearCart();
+            toast({
+              title: "Payment Successful",
+              description: "Payment completed but order could not be saved. Please contact support with your payment confirmation.",
+              variant: "destructive",
+            });
+            setLocation('/order-success');
+          }
         }
       } else {
         // Handle Indian payment methods (GPay, PhonePe, Paytm)
@@ -186,14 +245,69 @@ function CheckoutForm() {
           }, 1000);
         }
         
-        // Simulate payment completion for demo (in real app, this would be handled by webhook)
-        setTimeout(() => {
-          clearCart();
-          toast({
-            title: "Payment Successful",
-            description: "Thank you for your purchase!",
-          });
-          setLocation('/order-success');
+        // Create order after simulated payment success
+        setTimeout(async () => {
+          try {
+            // Calculate totals
+            const subtotal = totalAmount;
+            const makingCharges = subtotal * 0.15; // 15% making charges
+            const gst = subtotal * 0.03; // 3% GST for India
+            const total = subtotal + makingCharges + gst;
+
+            // Prepare order data
+            const orderData = {
+              customerName: customerInfo.name,
+              customerEmail: customerInfo.email,
+              customerPhone: customerInfo.phone,
+              customerAddress: `${customerInfo.address}, ${customerInfo.city}, ${customerInfo.state} ${customerInfo.postalCode}, ${customerInfo.country}`,
+              currency: 'INR',
+              subtotal,
+              makingCharges,
+              gst,
+              vat: 0,
+              discount: 0,
+              total,
+              paidAmount: total,
+              paymentMethod: paymentMethod.toUpperCase(),
+              items: items.map(item => ({
+                productId: item.product.id,
+                productName: item.product.name,
+                quantity: item.quantity,
+                priceInr: item.product.priceInr,
+                priceBhd: item.product.priceBhd,
+                grossWeight: item.product.grossWeight,
+                netWeight: item.product.netWeight,
+                makingCharges: (parseFloat(item.product.priceInr) * item.quantity * 0.15).toFixed(2),
+                discount: '0',
+                sgst: (parseFloat(item.product.priceInr) * item.quantity * 0.015).toFixed(2),
+                cgst: (parseFloat(item.product.priceInr) * item.quantity * 0.015).toFixed(2),
+                vat: '0',
+                total: (parseFloat(item.product.priceInr) * item.quantity * 1.18).toFixed(2)
+              }))
+            };
+
+            // Create order in database
+            const response = await apiRequest('/api/orders', {
+              method: 'POST',
+              body: JSON.stringify(orderData)
+            });
+
+            if (response) {
+              clearCart();
+              toast({
+                title: "Payment Successful",
+                description: `Order ${response.orderNumber} created successfully!`,
+              });
+              setLocation('/order-success');
+            }
+          } catch (error) {
+            console.error('Failed to create order:', error);
+            toast({
+              title: "Order Creation Failed",
+              description: "Payment successful but order could not be saved. Please contact support.",
+              variant: "destructive",
+            });
+          }
         }, 3000);
       }
     } catch (error) {
