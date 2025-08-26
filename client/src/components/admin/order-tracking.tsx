@@ -89,22 +89,25 @@ export default function OrderTracking() {
   // Fetch orders
   const { data: orders = [], isLoading: ordersLoading } = useQuery({
     queryKey: ['/api/orders'],
-    queryFn: () => apiRequest('/api/orders')
+    queryFn: async () => {
+      const response = await apiRequest('GET', '/api/orders');
+      return response.json();
+    }
   });
 
   // Fetch shipments
   const { data: shipments = [], isLoading: shipmentsLoading } = useQuery({
     queryKey: ['/api/shipments'],
-    queryFn: () => apiRequest('/api/shipments')
+    queryFn: async () => {
+      const response = await apiRequest('GET', '/api/shipments');
+      return response.json();
+    }
   });
 
   // Update shipment status mutation
   const updateShipmentMutation = useMutation({
     mutationFn: (data: { id: string; updateData: any }) =>
-      apiRequest(`/api/shipments/${data.id}/status`, {
-        method: 'PUT',
-        body: JSON.stringify(data.updateData)
-      }),
+      apiRequest('PUT', `/api/shipments/${data.id}/status`, data.updateData),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/shipments'] });
       queryClient.invalidateQueries({ queryKey: ['/api/orders'] });
