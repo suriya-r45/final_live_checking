@@ -204,7 +204,7 @@ const HOME_CATEGORIES = {
 };
 
 export function EstimateForm() {
-  console.log('🔥 EstimateForm - Component mounting/rendering');
+  console.log('🔥 EstimateForm - Component rendering');
   
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -213,49 +213,38 @@ export function EstimateForm() {
   const [isEditMode, setIsEditMode] = useState(false);
   const [editingEstimateId, setEditingEstimateId] = useState<string | null>(null);
 
-  // Check authentication status first
-  const token = localStorage.getItem("token");
-  console.log('🔍 EstimateForm - Token exists:', !!token);
-  
-  // If not authenticated, show login message
-  if (!token) {
-    return (
-      <div className="max-w-4xl mx-auto p-4 sm:p-6">
-        <Card className="border-2 border-red-300 bg-red-50">
-          <CardHeader>
-            <CardTitle className="text-red-800">Authentication Required</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-red-700 mb-4">
-              You need to be logged in as an admin to create estimates.
-            </p>
-            <Button
-              onClick={() => setLocation('/login')}
-              className="bg-red-800 hover:bg-red-700 text-white"
-            >
-              Go to Login
+  // Simple return to test component rendering
+  return (
+    <div className="max-w-4xl mx-auto p-4 sm:p-6">
+      <Card className="border-2 border-blue-300 bg-blue-50">
+        <CardHeader>
+          <CardTitle className="text-blue-800">Estimate Form - Component Working!</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-blue-700 mb-4">
+            The EstimateForm component is now rendering successfully.
+          </p>
+          <div className="space-y-4">
+            <div>
+              <Label>Customer Name</Label>
+              <Input placeholder="Enter customer name" />
+            </div>
+            <div>
+              <Label>Phone Number</Label>
+              <Input placeholder="Enter phone number" />
+            </div>
+            <div>
+              <Label>Product Name</Label>
+              <Input placeholder="Enter product name" />
+            </div>
+            <Button className="w-full bg-blue-800 hover:bg-blue-700 text-white">
+              Create Test Estimate
             </Button>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
-
-  // Fetch existing products for selection
-  const { data: existingProducts, isLoading: isProductsLoading, error: productsError } = useQuery<Product[]>({
-    queryKey: ["/api/products"],
-    queryFn: async () => {
-      const response = await fetch("/api/products", {
-        headers: {
-          "Authorization": `Bearer ${localStorage.getItem("token")}`,
-        },
-      });
-      if (!response.ok) {
-        throw new Error("Failed to fetch products");
-      }
-      return response.json();
-    },
-  });
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
 
   const [formData, setFormData] = useState<EstimateFormData>({
     customerName: "",
