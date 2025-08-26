@@ -33,6 +33,21 @@ export default function Cart() {
       });
       return;
     }
+    
+    // Check if user is logged in
+    const token = localStorage.getItem('token');
+    const user = localStorage.getItem('user');
+    
+    if (!token || !user) {
+      toast({
+        title: "Login Required",
+        description: "Please login to continue with checkout",
+        variant: "destructive",
+      });
+      setLocation('/login');
+      return;
+    }
+    
     setLocation('/checkout');
   };
 

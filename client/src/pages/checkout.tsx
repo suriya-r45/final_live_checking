@@ -2,6 +2,7 @@ import { Elements, PaymentElement, useStripe, useElements } from '@stripe/react-
 import { loadStripe } from '@stripe/stripe-js';
 import { useEffect, useState } from 'react';
 import { useCart } from '@/lib/cart';
+import { useAuth } from '@/lib/auth';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -24,6 +25,7 @@ function CheckoutForm() {
   const stripe = stripePromise ? useStripe() : null;
   const elements = stripePromise ? useElements() : null;
   const { items, totalAmount, clearCart } = useCart();
+  const { user, token } = useAuth();
   const { toast } = useToast();
   const [, setLocation] = useLocation();
   const [isProcessing, setIsProcessing] = useState(false);
@@ -42,6 +44,19 @@ function CheckoutForm() {
     return () => clearTimeout(timer);
   }, []);
   
+  // Check authentication and redirect if not logged in
+  useEffect(() => {
+    if (!user || !token) {
+      toast({
+        title: "Login Required",
+        description: "Please login to continue with checkout.",
+        variant: "destructive",
+      });
+      setLocation('/login');
+      return;
+    }
+  }, [user, token, setLocation, toast]);
+  
   // Redirect to cart if no items (only after cart is loaded)
   useEffect(() => {
     if (cartLoaded && items.length === 0) {
@@ -54,11 +69,11 @@ function CheckoutForm() {
     }
   }, [cartLoaded, items.length, setLocation, toast]);
   
-  // Customer information
+  // Customer information - auto-populate from logged-in user
   const [customerInfo, setCustomerInfo] = useState({
-    name: '',
-    email: '',
-    phone: '',
+    name: user?.name || '',
+    email: user?.email || '',
+    phone: user?.mobile || '',
     address: '',
     city: '',
     state: '',
@@ -66,6 +81,18 @@ function CheckoutForm() {
     country: '',
     deliveryInstructions: ''
   });
+
+  // Update customer info when user data is available
+  useEffect(() => {
+    if (user) {
+      setCustomerInfo(prev => ({
+        ...prev,
+        name: user.name || prev.name,
+        email: user.email || prev.email,
+        phone: user.mobile || prev.phone,
+      }));
+    }
+  }, [user]);
   
   // Auto-detect Indian user based on phone number
   useEffect(() => {
@@ -153,16 +180,14 @@ function CheckoutForm() {
             };
 
             // Create order in database
-            const response = await apiRequest('/api/orders', {
-              method: 'POST',
-              body: JSON.stringify(orderData)
-            });
+            const response = await apiRequest('POST', '/api/orders', orderData);
+            const orderResult = await response.json();
 
-            if (response) {
+            if (orderResult) {
               clearCart();
               toast({
                 title: "Payment Successful",
-                description: `Order ${response.orderNumber} created successfully!`,
+                description: `Order ${orderResult.orderNumber} created successfully!`,
               });
               setLocation('/order-success');
             }
@@ -287,16 +312,14 @@ function CheckoutForm() {
             };
 
             // Create order in database
-            const response = await apiRequest('/api/orders', {
-              method: 'POST',
-              body: JSON.stringify(orderData)
-            });
+            const response = await apiRequest('POST', '/api/orders', orderData);
+            const orderResult = await response.json();
 
-            if (response) {
+            if (orderResult) {
               clearCart();
               toast({
                 title: "Payment Successful",
-                description: `Order ${response.orderNumber} created successfully!`,
+                description: `Order ${orderResult.orderNumber} created successfully!`,
               });
               setLocation('/order-success');
             }

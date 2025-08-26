@@ -1111,7 +1111,7 @@ Premium quality, timeless beauty.`;
   });
 
   // Orders routes (for e-commerce checkout)
-  app.post("/api/orders", async (req, res) => {
+  app.post("/api/orders", authenticateToken, async (req, res) => {
     try {
       const orderData = req.body;
       
