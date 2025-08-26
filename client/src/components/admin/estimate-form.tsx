@@ -396,7 +396,33 @@ export function EstimateForm() {
       const categoryAbbr = getCategoryAbbreviation(formData.category);
       const subCategoryAbbr = getSubCategoryAbbreviation(formData.category, formData.subCategory);
       const year = new Date().getFullYear();
-      const sequence = Math.floor(Math.random() * 999) + 1; // Random for estimates
+      // Now fetch actual products to get real product codes
+      const response = await fetch("/api/products", {
+        headers: {
+          "Authorization": `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
+      
+      if (!response.ok) {
+        throw new Error("Failed to fetch products");
+      }
+      
+      const products = await response.json();
+      
+      // Find a product with matching category and subcategory
+      const matchingProduct = products.find((product: any) => 
+        product.category.toLowerCase() === formData.category.toLowerCase() && 
+        product.subCategory?.toLowerCase() === formData.subCategory.toLowerCase()
+      );
+      
+      if (matchingProduct && matchingProduct.productCode) {
+        // Use the existing product's code
+        setFormData(prev => ({ ...prev, productCode: matchingProduct.productCode }));
+        return; // Exit here since we found and set the code
+      }
+      
+      // If no matching product found, still generate code for now
+      const sequence = Math.floor(Math.random() * 999) + 1;
       
       const generatedCode = `PJ-${categoryAbbr}-${subCategoryAbbr}-${year}-${String(sequence).padStart(3, '0')}`;
       
@@ -749,9 +775,9 @@ export function EstimateForm() {
                   <Input
                     id="productCode"
                     value={formData.productCode}
-                    placeholder="Enter product code (e.g. PJ-RN-ENG-2025-002)"
-                    onChange={(e) => handleInputChange("productCode", e.target.value)}
-                    className="bg-white"
+                    placeholder="Select category and subcategory to fetch product code"
+                    readOnly
+                    className="bg-gray-50 cursor-not-allowed"
                   />
                 </div>
                 <div>
