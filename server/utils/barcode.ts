@@ -22,10 +22,25 @@ export async function generateProductCode(category: string, subCategory?: string
   const categoryAbbreviation = getCategoryAbbreviation(category);
   const subCategoryAbbreviation = getSubCategoryAbbreviation(category, subCategory);
   
-  // Get count of existing products efficiently using SQL COUNT
-  const [result] = await db.select({ count: sql<number>`count(*)` }).from(products);
-  const productCount = result?.count || 0;
-  const sequentialNumber = String(productCount + 1).padStart(3, '0');
+  // Get the highest sequence number from existing product codes to ensure true sequential numbering
+  const existingProducts = await db.select({ productCode: products.productCode }).from(products);
+  
+  let maxSequence = 0;
+  existingProducts.forEach(product => {
+    if (product.productCode) {
+      // Extract sequence number from product code (format: PJ-XX-XXX-YYYY-###)
+      const parts = product.productCode.split('-');
+      if (parts.length >= 5) {
+        const sequenceStr = parts[parts.length - 1];
+        const sequence = parseInt(sequenceStr, 10);
+        if (!isNaN(sequence) && sequence > maxSequence) {
+          maxSequence = sequence;
+        }
+      }
+    }
+  });
+  
+  const sequentialNumber = String(maxSequence + 1).padStart(3, '0');
   
   return `PJ-${categoryAbbreviation}-${subCategoryAbbreviation}-${year}-${sequentialNumber}`;
 }
