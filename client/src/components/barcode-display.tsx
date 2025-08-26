@@ -30,11 +30,13 @@ Approx Price: ₹${parseInt(product.priceInr).toLocaleString('en-IN')}`;
 
         QRCode.toCanvas(qrCodeRef.current, qrData, {
           width: 200,
-          margin: 2,
+          margin: 4,
           color: {
             dark: '#000000',
             light: '#FFFFFF'
-          }
+          },
+          errorCorrectionLevel: 'H',
+          scale: 8
         });
       } catch (error) {
         console.error('Error generating QR code:', error);
@@ -59,11 +61,13 @@ Approx Price: ₹${parseInt(product.priceInr).toLocaleString('en-IN')}`;
     try {
       const qrCodeDataURL = await QRCode.toDataURL(qrData, {
         width: 150,
-        margin: 2,
+        margin: 4,
         color: {
           dark: '#000000',
           light: '#FFFFFF'
-        }
+        },
+        errorCorrectionLevel: 'H',
+        scale: 8
       });
 
       const printWindow = window.open('', '_blank');
