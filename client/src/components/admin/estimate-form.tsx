@@ -5,10 +5,11 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Calculator, Clock, DollarSign, ArrowLeft } from "lucide-react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { useLocation } from "wouter";
+import { Product } from "@shared/schema";
 
 interface EstimateFormData {
   customerName: string;
@@ -21,6 +22,7 @@ interface EstimateFormData {
   grossWeight: string;
   netWeight: string;
   productCode: string;
+  selectedProductId?: string;
   metalValue: string;
   makingChargesPercentage: string;
   makingCharges: string;
@@ -209,6 +211,18 @@ export function EstimateForm() {
   const [isEditMode, setIsEditMode] = useState(false);
   const [editingEstimateId, setEditingEstimateId] = useState<string | null>(null);
 
+  // Fetch existing products for selection
+  const { data: existingProducts } = useQuery<Product[]>({
+    queryKey: ["/api/products"],
+    queryFn: async () => {
+      const response = await fetch("/api/products");
+      if (!response.ok) {
+        throw new Error("Failed to fetch products");
+      }
+      return response.json();
+    },
+  });
+
   const [formData, setFormData] = useState<EstimateFormData>({
     customerName: "",
     customerPhone: "",
@@ -220,6 +234,7 @@ export function EstimateForm() {
     grossWeight: "",
     netWeight: "",
     productCode: "",
+    selectedProductId: "",
     metalValue: "",
     makingChargesPercentage: "15",
     makingCharges: "",
@@ -293,12 +308,13 @@ export function EstimateForm() {
 
   // Auto-generate product code when category and subcategory are selected
   useEffect(() => {
-    if (formData.category && formData.subCategory) {
+    // Only generate new product code if not selecting an existing product
+    if (formData.category && formData.subCategory && !formData.selectedProductId) {
       generateProductCodeForEstimate();
-    } else {
+    } else if (!formData.selectedProductId) {
       setFormData(prev => ({ ...prev, productCode: "" }));
     }
-  }, [formData.category, formData.subCategory]);
+  }, [formData.category, formData.subCategory, formData.selectedProductId]);
 
   // Auto-populate product name when purity and subcategory are selected
   useEffect(() => {
@@ -474,6 +490,7 @@ export function EstimateForm() {
         grossWeight: "",
         netWeight: "",
         productCode: "",
+        selectedProductId: "",
         metalValue: "",
         makingChargesPercentage: "15",
         makingCharges: "",
@@ -564,6 +581,7 @@ export function EstimateForm() {
       grossWeight: "",
       netWeight: "",
       productCode: "",
+      selectedProductId: "",
       metalValue: "",
       makingChargesPercentage: "15",
       makingCharges: "",
@@ -700,6 +718,59 @@ export function EstimateForm() {
             {/* Product Information */}
             <div className="bg-white p-4 rounded-lg border">
               <h3 className="text-lg font-semibold text-gray-800 mb-4">Product Details</h3>
+              
+              {/* Product Selection Option */}
+              <div className="mb-4 p-3 bg-gray-50 rounded-lg">
+                <Label htmlFor="existingProduct">Select Existing Product (Optional)</Label>
+                <Select 
+                  value={formData.selectedProductId || ""} 
+                  onValueChange={(value) => {
+                    if (value) {
+                      // When selecting an existing product, populate all fields
+                      const selectedProduct = existingProducts?.find(p => p.id === value);
+                      if (selectedProduct) {
+                        setFormData(prev => ({
+                          ...prev,
+                          selectedProductId: value,
+                          productName: selectedProduct.name,
+                          category: selectedProduct.category,
+                          subCategory: selectedProduct.subCategory || "",
+                          purity: selectedProduct.purity || "22K",
+                          grossWeight: selectedProduct.grossWeight?.toString() || "",
+                          netWeight: selectedProduct.netWeight?.toString() || "",
+                          productCode: selectedProduct.productCode || ""
+                        }));
+                      }
+                    } else {
+                      // Clear selection
+                      setFormData(prev => ({
+                        ...prev,
+                        selectedProductId: "",
+                        productName: "",
+                        category: "",
+                        subCategory: "",
+                        productCode: ""
+                      }));
+                    }
+                  }}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Choose existing product or create custom estimate" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="">Create Custom Estimate</SelectItem>
+                    {existingProducts?.map((product) => (
+                      <SelectItem key={product.id} value={product.id}>
+                        {product.name} - {product.productCode}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <p className="text-xs text-gray-500 mt-1">
+                  Select an existing product to use its details, or leave blank to create a custom estimate
+                </p>
+              </div>
+
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <Label htmlFor="category">Category</Label>
