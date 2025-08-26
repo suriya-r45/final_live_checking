@@ -214,11 +214,19 @@ export function EstimateForm() {
   const [isEditMode, setIsEditMode] = useState(false);
   const [editingEstimateId, setEditingEstimateId] = useState<string | null>(null);
 
+  // Check authentication status
+  const token = localStorage.getItem("token");
+  console.log('EstimateForm - Token exists:', !!token);
+
   // Fetch existing products for selection
-  const { data: existingProducts } = useQuery<Product[]>({
+  const { data: existingProducts, isLoading: isProductsLoading, error: productsError } = useQuery<Product[]>({
     queryKey: ["/api/products"],
     queryFn: async () => {
-      const response = await fetch("/api/products");
+      const response = await fetch("/api/products", {
+        headers: {
+          "Authorization": `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
       if (!response.ok) {
         throw new Error("Failed to fetch products");
       }
@@ -664,7 +672,48 @@ export function EstimateForm() {
   // Debug: Log current state
   console.log('EstimateForm - Current formData:', formData);
   console.log('EstimateForm - Products loading:', isProductsLoading);
+  console.log('EstimateForm - Products error:', productsError);
   console.log('EstimateForm - Existing products:', existingProducts?.length || 0);
+
+  // If not authenticated, show login message
+  if (!token) {
+    return (
+      <div className="max-w-4xl mx-auto p-4 sm:p-6">
+        <Card className="border-2 border-red-300 bg-red-50">
+          <CardHeader>
+            <CardTitle className="text-red-800">Authentication Required</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-red-700 mb-4">
+              You need to be logged in as an admin to create estimates.
+            </p>
+            <Button
+              onClick={() => setLocation('/login')}
+              className="bg-red-800 hover:bg-red-700 text-white"
+            >
+              Go to Login
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  // Show loading state
+  if (isProductsLoading) {
+    return (
+      <div className="max-w-4xl mx-auto p-4 sm:p-6">
+        <Card className="border-2 border-gold bg-gradient-to-r from-cream to-champagne/30">
+          <CardHeader>
+            <CardTitle>Loading...</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p>Loading estimate form...</p>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-4xl mx-auto p-4 sm:p-6">

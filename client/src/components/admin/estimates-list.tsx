@@ -43,7 +43,11 @@ export function EstimatesList() {
   const [searchQuery, setSearchQuery] = useState("");
   const [, setLocation] = useLocation();
 
-  const { data: estimates = [], isLoading } = useQuery({
+  // Check authentication status
+  const token = localStorage.getItem("token");
+  console.log('EstimatesList - Token exists:', !!token);
+
+  const { data: estimates = [], isLoading, error } = useQuery({
     queryKey: ["/api/estimates"],
     queryFn: async () => {
       const response = await fetch("/api/estimates", {
@@ -113,10 +117,57 @@ export function EstimatesList() {
     }
   };
 
+  // If not authenticated, show login message
+  if (!token) {
+    return (
+      <div className="max-w-4xl mx-auto p-4 sm:p-6">
+        <Card className="border-2 border-red-300 bg-red-50">
+          <CardHeader>
+            <CardTitle className="text-red-800">Authentication Required</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-red-700 mb-4">
+              You need to be logged in as an admin to view estimates.
+            </p>
+            <Button
+              onClick={() => setLocation('/login')}
+              className="bg-red-800 hover:bg-red-700 text-white"
+            >
+              Go to Login
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center p-8">
         <div className="text-gray-600">Loading estimates...</div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="max-w-4xl mx-auto p-4 sm:p-6">
+        <Card className="border-2 border-red-300 bg-red-50">
+          <CardHeader>
+            <CardTitle className="text-red-800">Error Loading Estimates</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-red-700 mb-4">
+              Failed to load estimates. Please check your authentication and try again.
+            </p>
+            <Button
+              onClick={() => setLocation('/login')}
+              className="bg-red-800 hover:bg-red-700 text-white"
+            >
+              Go to Login
+            </Button>
+          </CardContent>
+        </Card>
       </div>
     );
   }
