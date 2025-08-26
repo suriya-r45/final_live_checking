@@ -263,17 +263,18 @@ function ProductForm({ currency }: ProductFormProps) {
       }
       return response.json();
     },
-    onSuccess: () => {
-      // Invalidate and refetch all product queries immediately
-      queryClient.invalidateQueries({ queryKey: ['/api/products'] });
+    onSuccess: (newProduct) => {
+      // Optimized cache update - add product to existing cache instead of full refetch
+      queryClient.setQueryData(['/api/products'], (oldData: Product[] | undefined) => {
+        return oldData ? [newProduct, ...oldData] : [newProduct];
+      });
+      
+      // Only invalidate categories if needed (less expensive)
       queryClient.invalidateQueries({ queryKey: ['/api/categories'] });
       
-      // Force immediate refetch for home page
-      queryClient.refetchQueries({ queryKey: ['/api/products'] });
-      
       toast({
-        title: "Success",
-        description: "Product added successfully! Home page will refresh automatically.",
+        title: "Success", 
+        description: "Product added successfully!",
       });
       resetForm();
     },

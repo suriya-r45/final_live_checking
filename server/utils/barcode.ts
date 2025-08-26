@@ -22,28 +22,19 @@ export async function generateProductCode(category: string, subCategory?: string
   const categoryAbbreviation = getCategoryAbbreviation(category);
   const subCategoryAbbreviation = getSubCategoryAbbreviation(category, subCategory);
   
-  // Get the highest sequence number from existing product codes to ensure true sequential numbering
-  const existingProducts = await db.select({ productCode: products.productCode }).from(products);
-  
+  // Optimized query: Get only the maximum sequence number using SQL MAX function
   let maxSequence = 0;
-  console.log('🔍 Existing product codes for sequence calculation:');
-  existingProducts.forEach(product => {
-    if (product.productCode) {
-      console.log(`   Product code: ${product.productCode}`);
-      // Extract sequence number from product code (format: PJ-XX-XXX-YYYY-###)
-      const parts = product.productCode.split('-');
-      if (parts.length >= 5) {
-        const sequenceStr = parts[parts.length - 1];
-        const sequence = parseInt(sequenceStr, 10);
-        console.log(`   Extracted sequence: ${sequence}`);
-        if (!isNaN(sequence) && sequence > maxSequence) {
-          maxSequence = sequence;
-        }
-      }
-    }
-  });
-  
-  console.log(`📊 Max sequence found: ${maxSequence}, Next will be: ${maxSequence + 1}`);
+  try {
+    const result = await db.select({ 
+      maxCode: sql<number>`MAX(CAST(SUBSTRING(product_code FROM LENGTH(product_code) - 2) AS INTEGER))`
+    }).from(products).where(sql`product_code ~ '^PJ-.*-[0-9]{3}$'`);
+    
+    maxSequence = result[0]?.maxCode || 0;
+  } catch (error) {
+    // Fallback to simple count if regex query fails
+    const count = await db.select({ count: sql<number>`count(*)` }).from(products);
+    maxSequence = count[0]?.count || 0;
+  }
   const sequentialNumber = String(maxSequence + 1).padStart(3, '0');
   
   return `PJ-${categoryAbbreviation}-${subCategoryAbbreviation}-${year}-${sequentialNumber}`;

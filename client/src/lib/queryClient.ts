@@ -60,12 +60,14 @@ export const queryClient = new QueryClient({
     queries: {
       queryFn: getQueryFn({ on401: "throw" }),
       refetchInterval: false,
-      refetchOnWindowFocus: true,
-      staleTime: 5 * 60 * 1000, // 5 minutes instead of Infinity
-      retry: false,
+      refetchOnWindowFocus: false, // Disable automatic refetch on focus for better performance
+      staleTime: 10 * 60 * 1000, // 10 minutes for better caching
+      retry: 1, // Only retry once on failure
+      networkMode: 'online', // Only fetch when online
     },
     mutations: {
-      retry: false,
+      retry: 1, // Retry mutations once
+      networkMode: 'online',
     },
   },
 });

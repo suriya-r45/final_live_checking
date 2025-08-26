@@ -405,55 +405,65 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const productData = insertProductSchema.parse(req.body);
 
-      // Handle uploaded images asynchronously
-      const imageUrls: string[] = [];
-      if (req.files && Array.isArray(req.files)) {
-        await Promise.all(req.files.map(async (file, index) => {
-          const filename = `${Date.now()}-${index}-${file.originalname}`;
-          const filepath = path.join(uploadsDir, filename);
-          await fs.promises.rename(file.path, filepath);
-          imageUrls.push(`/uploads/${filename}`);
-        }));
-      }
+      // Start product code generation immediately (most expensive operation)
+      const productCodePromise = generateProductCode(productData.category, productData.subCategory);
 
-      // Generate product code and handle barcode generation in parallel
-      const [productCode, goldRateResult] = await Promise.all([
-        generateProductCode(productData.category, productData.subCategory),
-        // Get current gold rate if it's a gold product
-        productData.metalType === 'GOLD' ? Promise.resolve(5652) : Promise.resolve(null)
+      // Handle uploaded images in parallel with optimized file operations
+      const imageUrlsPromise = (async () => {
+        const imageUrls: string[] = [];
+        if (req.files && Array.isArray(req.files)) {
+          // Process images in parallel batches for better performance
+          const imagePromises = req.files.map(async (file, index) => {
+            const filename = `${Date.now()}-${index}-${file.originalname}`;
+            const filepath = path.join(uploadsDir, filename);
+            await fs.promises.rename(file.path, filepath);
+            return `/uploads/${filename}`;
+          });
+          imageUrls.push(...await Promise.all(imagePromises));
+        }
+        return imageUrls;
+      })();
+
+      // Get gold rate for gold products only
+      const goldRatePromise = productData.metalType === 'GOLD' ? Promise.resolve(5652) : Promise.resolve(null);
+
+      // Wait for all essential operations
+      const [productCode, imageUrls, goldRateAtCreation] = await Promise.all([
+        productCodePromise,
+        imageUrlsPromise, 
+        goldRatePromise
       ]);
-      
-      const goldRateAtCreation = goldRateResult;
 
-      // Generate barcode data
-      const barcodeData: ProductBarcodeData = {
-        productCode,
-        productName: productData.name,
-        purity: productData.purity || '22K',
-        grossWeight: `${productData.grossWeight} g`,
-        netWeight: `${productData.netWeight} g`,
-        stones: productData.stones || 'None',
-        goldRate: goldRateAtCreation ? `₹${goldRateAtCreation} / g` : 'N/A',
-        approxPrice: `₹${productData.priceInr.toLocaleString('en-IN')} (excluding charges)`
-      };
-
-      // Generate barcode (optimized for speed)
-      let barcodeImageUrl = '';
-      try {
-        const { imagePath } = await generateBarcode(JSON.stringify(barcodeData), productCode);
-        barcodeImageUrl = imagePath;
-      } catch (error) {
-        console.warn('Could not generate barcode:', error);
-      }
-
+      // Create product immediately, defer barcode generation
       const product = await storage.createProduct({
         ...productData,
         images: imageUrls,
         productCode,
         goldRateAtCreation: goldRateAtCreation || undefined,
         barcode: productCode,
-        barcodeImageUrl,
+        barcodeImageUrl: '', // Will be generated asynchronously
         isActive: productData.isActive ?? true
+      });
+
+      // Generate barcode asynchronously (don't block response)
+      setImmediate(async () => {
+        try {
+          const barcodeData: ProductBarcodeData = {
+            productCode,
+            productName: productData.name,
+            purity: productData.purity || '22K',
+            grossWeight: `${productData.grossWeight} g`,
+            netWeight: `${productData.netWeight} g`,
+            stones: productData.stones || 'None',
+            goldRate: goldRateAtCreation ? `₹${goldRateAtCreation} / g` : 'N/A',
+            approxPrice: `₹${productData.priceInr.toLocaleString('en-IN')} (excluding charges)`
+          };
+
+          const { imagePath } = await generateBarcode(JSON.stringify(barcodeData), productCode);
+          await storage.updateProduct(product.id, { barcodeImageUrl: imagePath });
+        } catch (error) {
+          console.warn('Async barcode generation failed:', error);
+        }
       });
 
       res.status(201).json(product);
