@@ -4,6 +4,7 @@ import fs from 'fs';
 import path from 'path';
 import { db } from '../db.js';
 import { products } from '../../shared/schema.js';
+import { sql } from 'drizzle-orm';
 
 export interface ProductBarcodeData {
   productCode: string;
@@ -21,9 +22,9 @@ export async function generateProductCode(category: string, subCategory?: string
   const categoryAbbreviation = getCategoryAbbreviation(category);
   const subCategoryAbbreviation = getSubCategoryAbbreviation(category, subCategory);
   
-  // Get count of existing products to generate sequential number
-  const existingProducts = await db.select().from(products);
-  const productCount = existingProducts.length;
+  // Get count of existing products efficiently using SQL COUNT
+  const [result] = await db.select({ count: sql<number>`count(*)` }).from(products);
+  const productCount = result?.count || 0;
   const sequentialNumber = String(productCount + 1).padStart(3, '0');
   
   return `PJ-${categoryAbbreviation}-${subCategoryAbbreviation}-${year}-${sequentialNumber}`;
