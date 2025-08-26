@@ -396,9 +396,27 @@ export function EstimateForm() {
       const categoryAbbr = getCategoryAbbreviation(formData.category);
       const subCategoryAbbr = getSubCategoryAbbreviation(formData.category, formData.subCategory);
       const year = new Date().getFullYear();
-      const sequence = Math.floor(Math.random() * 999) + 1; // Random for estimates
       
-      const generatedCode = `PJ-${categoryAbbr}-${subCategoryAbbr}-${year}-${String(sequence).padStart(3, '0')}`;
+      // Fetch existing products to get proper sequential numbering
+      const response = await fetch('/api/products');
+      const existingProducts = await response.json();
+      
+      let maxSequence = 0;
+      existingProducts.forEach((product: any) => {
+        if (product.productCode) {
+          const parts = product.productCode.split('-');
+          if (parts.length >= 5) {
+            const sequenceStr = parts[parts.length - 1];
+            const sequence = parseInt(sequenceStr, 10);
+            if (!isNaN(sequence) && sequence > maxSequence) {
+              maxSequence = sequence;
+            }
+          }
+        }
+      });
+      
+      const sequentialNumber = String(maxSequence + 1).padStart(3, '0');
+      const generatedCode = `PJ-${categoryAbbr}-${subCategoryAbbr}-${year}-${sequentialNumber}`;
       
       setFormData(prev => ({ ...prev, productCode: generatedCode }));
     } catch (error) {
