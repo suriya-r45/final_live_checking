@@ -745,13 +745,13 @@ export function EstimateForm() {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="productCode">Product Code (Auto-Generated)</Label>
+                  <Label htmlFor="productCode">Product Code</Label>
                   <Input
                     id="productCode"
                     value={formData.productCode}
-                    placeholder="Select category and subcategory to auto-generate"
-                    readOnly
-                    className="bg-gray-50 cursor-not-allowed"
+                    placeholder="Enter product code (e.g. PJ-RN-ENG-2025-002)"
+                    onChange={(e) => handleInputChange("productCode", e.target.value)}
+                    className="bg-white"
                   />
                 </div>
                 <div>
