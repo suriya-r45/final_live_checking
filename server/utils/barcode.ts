@@ -26,13 +26,16 @@ export async function generateProductCode(category: string, subCategory?: string
   const existingProducts = await db.select({ productCode: products.productCode }).from(products);
   
   let maxSequence = 0;
+  console.log('🔍 Existing product codes for sequence calculation:');
   existingProducts.forEach(product => {
     if (product.productCode) {
+      console.log(`   Product code: ${product.productCode}`);
       // Extract sequence number from product code (format: PJ-XX-XXX-YYYY-###)
       const parts = product.productCode.split('-');
       if (parts.length >= 5) {
         const sequenceStr = parts[parts.length - 1];
         const sequence = parseInt(sequenceStr, 10);
+        console.log(`   Extracted sequence: ${sequence}`);
         if (!isNaN(sequence) && sequence > maxSequence) {
           maxSequence = sequence;
         }
@@ -40,6 +43,7 @@ export async function generateProductCode(category: string, subCategory?: string
     }
   });
   
+  console.log(`📊 Max sequence found: ${maxSequence}, Next will be: ${maxSequence + 1}`);
   const sequentialNumber = String(maxSequence + 1).padStart(3, '0');
   
   return `PJ-${categoryAbbreviation}-${subCategoryAbbreviation}-${year}-${sequentialNumber}`;
