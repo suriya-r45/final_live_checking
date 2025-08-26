@@ -212,39 +212,9 @@ export function EstimateForm() {
   
   const [isEditMode, setIsEditMode] = useState(false);
   const [editingEstimateId, setEditingEstimateId] = useState<string | null>(null);
-
-  // Simple return to test component rendering
-  return (
-    <div className="max-w-4xl mx-auto p-4 sm:p-6">
-      <Card className="border-2 border-blue-300 bg-blue-50">
-        <CardHeader>
-          <CardTitle className="text-blue-800">Estimate Form - Component Working!</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-blue-700 mb-4">
-            The EstimateForm component is now rendering successfully.
-          </p>
-          <div className="space-y-4">
-            <div>
-              <Label>Customer Name</Label>
-              <Input placeholder="Enter customer name" />
-            </div>
-            <div>
-              <Label>Phone Number</Label>
-              <Input placeholder="Enter phone number" />
-            </div>
-            <div>
-              <Label>Product Name</Label>
-              <Input placeholder="Enter product name" />
-            </div>
-            <Button className="w-full bg-blue-800 hover:bg-blue-700 text-white">
-              Create Test Estimate
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-    </div>
-  );
+  
+  // Get token from localStorage for authentication
+  const token = localStorage.getItem("token");
 
   const [formData, setFormData] = useState<EstimateFormData>({
     customerName: "",
