@@ -84,9 +84,7 @@ export function EstimatesList() {
   // Mutation to delete estimate
   const deleteEstimateMutation = useMutation({
     mutationFn: async (estimateId: string) => {
-      return apiRequest(`/api/estimates/${estimateId}`, {
-        method: 'DELETE',
-      });
+      return apiRequest(`/api/estimates/${estimateId}`, 'DELETE');
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/estimates'] });
@@ -108,15 +106,18 @@ export function EstimatesList() {
   // Mutation to send estimate to WhatsApp
   const sendToWhatsAppMutation = useMutation({
     mutationFn: async (estimateId: string) => {
-      return apiRequest(`/api/estimates/${estimateId}/send-whatsapp`, {
-        method: 'POST',
-      });
+      const response = await apiRequest(`/api/estimates/${estimateId}/send-whatsapp`, 'POST');
+      return response.json();
     },
-    onSuccess: () => {
+    onSuccess: (data: { whatsappUrl: string; message: string }) => {
       queryClient.invalidateQueries({ queryKey: ['/api/estimates'] });
+      
+      // Open WhatsApp with the generated URL
+      window.open(data.whatsappUrl, '_blank', 'noopener,noreferrer');
+      
       toast({
         title: "Success",
-        description: "Estimate sent to WhatsApp successfully",
+        description: "Opening WhatsApp with estimate details...",
       });
     },
     onError: (error) => {
