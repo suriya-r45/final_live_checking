@@ -131,7 +131,7 @@ export default function AdminDashboard() {
 📊 Gross Weight: ${product.grossWeight} g
 📈 Net Weight: ${product.netWeight} g
 💎 Stone: ${product.stones || 'None'}
-📉 Gold Rate: ${product.goldRateAtCreation ? \`₹\${product.goldRateAtCreation}/g\` : 'N/A'}
+📉 Gold Rate: ${product.goldRateAtCreation ? '₹' + product.goldRateAtCreation + '/g' : 'N/A'}
 💰 Approx Price: ₹${parseInt(product.priceInr).toLocaleString('en-IN')}
 
 📞 Contact: +91 95972 01554
