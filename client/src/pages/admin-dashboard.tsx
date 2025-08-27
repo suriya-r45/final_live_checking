@@ -115,35 +115,65 @@ export default function AdminDashboard() {
           <body>
             ${barcodesHTML}
             <script>
-              ${selectedProductsList.map(product => `
-                const qrData${product.id} = \`🏷️ PALANIAPPA JEWELLERS
+              function generateQRCodes() {
+                if (typeof QRCode === 'undefined') {
+                  console.log('QRCode library not loaded, retrying...');
+                  setTimeout(generateQRCodes, 100);
+                  return;
+                }
+                
+                ${selectedProductsList.map(product => `
+                  try {
+                    const qrData${product.id} = \`🏷️ PALANIAPPA JEWELLERS
 📋 Product Code: ${product.productCode}
 💍 Product Name: ${product.name}
 ⚖️ Purity: ${product.purity || '22K'}
 📊 Gross Weight: ${product.grossWeight} g
 📈 Net Weight: ${product.netWeight} g
 💎 Stone: ${product.stones || 'None'}
-📉 Gold Rate: ${product.goldRateAtCreation ? `₹${product.goldRateAtCreation}/g` : 'N/A'}
+📉 Gold Rate: ${product.goldRateAtCreation ? \`₹\${product.goldRateAtCreation}/g\` : 'N/A'}
 💰 Approx Price: ₹${parseInt(product.priceInr).toLocaleString('en-IN')}
 
 📞 Contact: +91 95972 01554
 💬 WhatsApp: +91 95972 01554\`;
+                    
+                    const canvas = document.getElementById("qrcode-${product.id}");
+                    if (canvas) {
+                      QRCode.toCanvas(canvas, qrData${product.id}, {
+                        width: 120,
+                        height: 120,
+                        margin: 2,
+                        color: {
+                          dark: '#000000',
+                          light: '#FFFFFF'
+                        },
+                        errorCorrectionLevel: 'M'
+                      }, function(error) {
+                        if (error) {
+                          console.error('QR Code generation error for ${product.id}:', error);
+                        } else {
+                          console.log('QR Code generated successfully for ${product.id}');
+                        }
+                      });
+                    }
+                  } catch (error) {
+                    console.error('Error generating QR for ${product.id}:', error);
+                  }
+                `).join('')}
                 
-                QRCode.toCanvas(document.getElementById("qrcode-${product.id}"), qrData${product.id}, {
-                  width: 120,
-                  margin: 4,
-                  color: {
-                    dark: '#000000',
-                    light: '#FFFFFF'
-                  },
-                  errorCorrectionLevel: 'H',
-                  scale: 6
-                });
-              `).join('')}
-              setTimeout(() => {
-                window.print();
-                window.close();
-              }, 1000);
+                // Wait for all QR codes to generate, then print
+                setTimeout(() => {
+                  window.print();
+                  setTimeout(() => window.close(), 500);
+                }, 2000);
+              }
+              
+              // Start generating QR codes when page loads
+              if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', generateQRCodes);
+              } else {
+                generateQRCodes();
+              }
             </script>
           </body>
         </html>
