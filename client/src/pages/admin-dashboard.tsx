@@ -83,7 +83,7 @@ export default function AdminDashboard() {
           const productType = product.name.split(' ')[0].toUpperCase();
           barcodesHTML += `
             <div style="border: 2px solid #000; border-radius: 10px; padding: 20px; width: 320px; text-align: center; background: white; position: relative; font-family: Arial, sans-serif;">
-              <div style="position: absolute; top: 8px; right: 8px; width: 12px; height: 12px; background-color: #000; border-radius: 50%; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; color-adjust: exact !important;"></div>
+              <div style="position: absolute; top: 8px; right: 8px; width: 12px; height: 12px; display: flex; align-items: center; justify-content: center; color: #000 !important; font-size: 12px; font-weight: bold; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; color-adjust: exact !important;">●</div>
               <div style="font-size: 14px; font-weight: bold; margin-bottom: 8px; letter-spacing: 1px;">PALANIAPPA JEWELLERS</div>
               <div style="font-size: 18px; font-weight: bold; margin-bottom: 8px; font-family: monospace;">${product.productCode}</div>
               <div style="font-size: 14px; font-weight: bold; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;">
