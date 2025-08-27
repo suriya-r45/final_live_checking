@@ -14,6 +14,7 @@ import Checkout from "@/pages/checkout";
 import OrderSuccess from "@/pages/order-success";
 import { EstimatesPage } from "@/pages/estimates";
 import CollectionsPage from "@/pages/collections";
+import QRScanResult from "@/pages/qr-scan-result";
 import { AuthProvider } from "./lib/auth";
 import { CartProvider } from "./lib/cart";
 
@@ -73,6 +74,7 @@ function Router() {
       <Route path="/cart" component={Cart} />
       <Route path="/checkout" component={Checkout} />
       <Route path="/order-success" component={OrderSuccess} />
+      <Route path="/qr-scan" component={QRScanResult} />
       <Route component={NotFound} />
     </Switch>
     </>

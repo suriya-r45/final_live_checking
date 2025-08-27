@@ -18,8 +18,9 @@ export function BarcodeDisplay({ product, className }: BarcodeDisplayProps) {
   useEffect(() => {
     if (qrCodeRef.current && product.productCode) {
       try {
-        // Create QR code data with all product information
-        const qrData = `Product Code: ${product.productCode}
+        // Create QR code data as URL to our enhanced display page
+        const baseUrl = window.location.origin;
+        const productData = `Product Code: ${product.productCode}
 Product Name: ${product.name}
 Purity: ${product.purity || '22K'}
 Gross Weight: ${product.grossWeight} g
@@ -27,6 +28,8 @@ Net Weight: ${product.netWeight} g
 Stone: ${product.stones || 'None'}
 Gold Rate: ${product.goldRateAtCreation ? `₹${product.goldRateAtCreation}/g` : 'N/A'}
 Approx Price: ₹${parseInt(product.priceInr).toLocaleString('en-IN')}`;
+        
+        const qrData = `${baseUrl}/qr-scan?data=${encodeURIComponent(productData)}`;
 
         QRCode.toCanvas(qrCodeRef.current, qrData, {
           width: 200,
@@ -48,8 +51,9 @@ Approx Price: ₹${parseInt(product.priceInr).toLocaleString('en-IN')}`;
   const grossWeight = `${product.grossWeight} g`;
 
   const handlePrint = async () => {
-    // Generate QR code data URL in the current window first
-    const qrData = `Product Code: ${product.productCode}
+    // Generate QR code data as URL for the enhanced display page
+    const baseUrl = window.location.origin;
+    const productData = `Product Code: ${product.productCode}
 Product Name: ${product.name}
 Purity: ${product.purity || '22K'}
 Gross Weight: ${grossWeight}
@@ -57,6 +61,8 @@ Net Weight: ${product.netWeight} g
 Stone: ${product.stones || 'None'}
 Gold Rate: ${product.goldRateAtCreation ? `₹${product.goldRateAtCreation}/g` : 'N/A'}
 Approx Price: ₹${parseInt(product.priceInr).toLocaleString('en-IN')}`;
+    
+    const qrData = `${baseUrl}/qr-scan?data=${encodeURIComponent(productData)}`;
 
     try {
       const qrCodeDataURL = await QRCode.toDataURL(qrData, {

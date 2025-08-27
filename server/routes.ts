@@ -2078,6 +2078,24 @@ For any queries, please contact us.`;
 
   // === END SHIPPING & LOGISTICS API ROUTES ===
 
+  // QR Scan result route
+  app.get("/api/qr-scan/:data", (req, res) => {
+    try {
+      const qrData = decodeURIComponent(req.params.data);
+      
+      // Parse QR data and redirect to frontend page with proper formatting
+      const baseUrl = process.env.REPLIT_DEV_DOMAIN ? 
+        `https://${process.env.REPLIT_DEV_DOMAIN}` : 
+        `http://localhost:5000`;
+      
+      const redirectUrl = `${baseUrl}/qr-scan?data=${encodeURIComponent(qrData)}`;
+      res.redirect(redirectUrl);
+    } catch (error) {
+      console.error('Error processing QR scan:', error);
+      res.status(400).json({ message: "Invalid QR data" });
+    }
+  });
+
   // Static file serving for uploads
   app.use('/uploads', (req, res, next) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
