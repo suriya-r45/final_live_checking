@@ -68,7 +68,7 @@ export function BarcodeDisplay({ product, className }: BarcodeDisplayProps) {
 
     try {
       const qrCodeDataURL = await QRCode.toDataURL(qrData, {
-        width: 150,
+        width: 200,
         margin: 4,
         color: {
           dark: '#000000',
@@ -85,73 +85,82 @@ export function BarcodeDisplay({ product, className }: BarcodeDisplayProps) {
             <head>
               <title>Product Barcode - ${product.name}</title>
               <style>
+                @page {
+                  size: A4;
+                  margin: 0.5in;
+                }
                 body { 
                   font-family: Arial, sans-serif; 
                   margin: 0; 
-                  padding: 20px; 
+                  padding: 10px; 
                   display: flex; 
                   justify-content: center; 
                   align-items: center; 
-                  min-height: 100vh;
+                  height: 100vh;
+                  box-sizing: border-box;
                 }
                 .barcode-container { 
                   border: 3px solid #000; 
                   border-radius: 15px; 
-                  padding: 30px; 
-                  width: 400px; 
+                  padding: 25px; 
+                  width: 350px; 
+                  max-width: 90%;
                   text-align: center; 
                   background: white;
-                  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
                   position: relative;
+                  box-sizing: border-box;
+                  page-break-inside: avoid;
                 }
                 .hole-dot {
                   position: absolute;
-                  top: 15px;
-                  right: 15px;
-                  width: 20px;
-                  height: 20px;
+                  top: 12px;
+                  right: 12px;
+                  width: 18px;
+                  height: 18px;
                   background-color: #000;
                   border-radius: 50%;
                   z-index: 10;
                 }
                 .store-name { 
-                  font-size: 20px; 
+                  font-size: 18px; 
                   font-weight: bold; 
-                  margin-bottom: 15px; 
+                  margin-bottom: 12px; 
                   letter-spacing: 1px;
                 }
                 .product-code-large { 
-                  font-size: 28px; 
+                  font-size: 24px; 
                   font-weight: bold; 
-                  margin-bottom: 15px; 
+                  margin-bottom: 12px; 
                   font-family: monospace;
                 }
                 .product-info { 
-                  font-size: 18px; 
+                  font-size: 16px; 
                   font-weight: bold; 
-                  margin-bottom: 15px; 
+                  margin-bottom: 12px; 
                   display: flex;
                   justify-content: space-between;
                   align-items: center;
                 }
                 .weight-info { 
-                  font-size: 16px; 
+                  font-size: 14px; 
                   font-weight: bold; 
-                  margin-bottom: 20px; 
+                  margin-bottom: 15px; 
                 }
                 .barcode-area { 
-                  margin: 20px 0; 
+                  margin: 15px 0; 
                   display: flex;
                   justify-content: center;
                 }
                 .qr-image {
-                  width: 150px;
-                  height: 150px;
+                  width: 140px;
+                  height: 140px;
+                  max-width: 140px;
+                  max-height: 140px;
                 }
                 .product-code-bottom { 
-                  font-size: 18px; 
+                  font-size: 16px; 
                   font-weight: bold; 
-                  margin-top: 15px; 
+                  margin-top: 12px; 
                   font-family: monospace;
                 }
               </style>
