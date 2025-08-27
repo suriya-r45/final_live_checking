@@ -36,6 +36,7 @@ export default function AdminDashboard() {
   });
   const [selectedBill, setSelectedBill] = useState<Bill | null>(null);
   const [productSearchTerm, setProductSearchTerm] = useState('');
+  const [billSearchTerm, setBillSearchTerm] = useState('');
 
   useEffect(() => {
     if (!isAdmin && !token) {
@@ -288,6 +289,18 @@ export default function AdminDashboard() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
+                  {/* Search Bills */}
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                    <input
+                      type="text"
+                      placeholder="Search by customer name, mobile number, or bill number..."
+                      value={billSearchTerm}
+                      onChange={(e) => setBillSearchTerm(e.target.value)}
+                      className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-transparent"
+                      data-testid="input-search-bills"
+                    />
+                  </div>
                   {bills.length === 0 ? (
                     <p className="text-gray-500 text-center py-8" data-testid="message-no-bills">
                       No bills generated yet.
@@ -306,7 +319,17 @@ export default function AdminDashboard() {
                           </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-200">
-                          {bills.map((bill) => (
+                          {bills
+                            .filter(bill => {
+                              if (!billSearchTerm) return true;
+                              const searchLower = billSearchTerm.toLowerCase();
+                              return (
+                                bill.customerName.toLowerCase().includes(searchLower) ||
+                                bill.customerPhone.toLowerCase().includes(searchLower) ||
+                                bill.billNumber.toLowerCase().includes(searchLower)
+                              );
+                            })
+                            .map((bill) => (
                             <tr key={bill.id} className="hover:bg-gray-50" data-testid={`row-bill-${bill.id}`}>
                               <td className="px-4 py-3 text-sm font-medium text-black">{bill.billNumber}</td>
                               <td className="px-4 py-3 text-sm text-gray-700">{bill.customerName}</td>
