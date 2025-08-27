@@ -247,6 +247,7 @@ export class DatabaseStorage implements IStorage {
     return updatedUser || undefined;
   }
 
+
   // Product operations
   async getAllProducts(): Promise<Product[]> {
     return await db.select().from(products).where(eq(products.isActive, true)).orderBy(desc(products.createdAt));
