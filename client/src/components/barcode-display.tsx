@@ -18,18 +18,19 @@ export function BarcodeDisplay({ product, className }: BarcodeDisplayProps) {
   useEffect(() => {
     if (qrCodeRef.current && product.productCode) {
       try {
-        // Create QR code data as URL to our enhanced display page
-        const baseUrl = window.location.origin;
-        const productData = `Product Code: ${product.productCode}
-Product Name: ${product.name}
-Purity: ${product.purity || '22K'}
-Gross Weight: ${product.grossWeight} g
-Net Weight: ${product.netWeight} g
-Stone: ${product.stones || 'None'}
-Gold Rate: ${product.goldRateAtCreation ? `₹${product.goldRateAtCreation}/g` : 'N/A'}
-Approx Price: ₹${parseInt(product.priceInr).toLocaleString('en-IN')}`;
-        
-        const qrData = `${baseUrl}/qr-scan?data=${encodeURIComponent(productData)}`;
+        // Generate text-only QR code data (no URLs)
+        const qrData = `🏷️ PALANIAPPA JEWELLERS
+📋 Product Code: ${product.productCode}
+💍 Product Name: ${product.name}
+⚖️ Purity: ${product.purity || '22K'}
+📊 Gross Weight: ${product.grossWeight} g
+📈 Net Weight: ${product.netWeight} g
+💎 Stone: ${product.stones || 'None'}
+📉 Gold Rate: ${product.goldRateAtCreation ? `₹${product.goldRateAtCreation}/g` : 'N/A'}
+💰 Approx Price: ₹${parseInt(product.priceInr).toLocaleString('en-IN')}
+
+📞 Contact: +91 95972 01554
+💬 WhatsApp: +91 95972 01554`;
 
         QRCode.toCanvas(qrCodeRef.current, qrData, {
           width: 200,
@@ -51,18 +52,19 @@ Approx Price: ₹${parseInt(product.priceInr).toLocaleString('en-IN')}`;
   const grossWeight = `${product.grossWeight} g`;
 
   const handlePrint = async () => {
-    // Generate QR code data as URL for the enhanced display page
-    const baseUrl = window.location.origin;
-    const productData = `Product Code: ${product.productCode}
-Product Name: ${product.name}
-Purity: ${product.purity || '22K'}
-Gross Weight: ${grossWeight}
-Net Weight: ${product.netWeight} g
-Stone: ${product.stones || 'None'}
-Gold Rate: ${product.goldRateAtCreation ? `₹${product.goldRateAtCreation}/g` : 'N/A'}
-Approx Price: ₹${parseInt(product.priceInr).toLocaleString('en-IN')}`;
-    
-    const qrData = `${baseUrl}/qr-scan?data=${encodeURIComponent(productData)}`;
+    // Generate text-only QR code data for printing (no URLs)
+    const qrData = `🏷️ PALANIAPPA JEWELLERS
+📋 Product Code: ${product.productCode}
+💍 Product Name: ${product.name}
+⚖️ Purity: ${product.purity || '22K'}
+📊 Gross Weight: ${grossWeight}
+📈 Net Weight: ${product.netWeight} g
+💎 Stone: ${product.stones || 'None'}
+📉 Gold Rate: ${product.goldRateAtCreation ? `₹${product.goldRateAtCreation}/g` : 'N/A'}
+💰 Approx Price: ₹${parseInt(product.priceInr).toLocaleString('en-IN')}
+
+📞 Contact: +91 95972 01554
+💬 WhatsApp: +91 95972 01554`;
 
     try {
       const qrCodeDataURL = await QRCode.toDataURL(qrData, {

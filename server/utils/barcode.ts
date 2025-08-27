@@ -321,15 +321,19 @@ export async function generateQRCode(data: ProductBarcodeData, productCode: stri
       fs.mkdirSync(uploadsDir, { recursive: true });
     }
 
-    // Format data for QR code
-    const qrData = `Product Code: ${data.productCode}
-Product Name: ${data.productName}
-Purity: ${data.purity}
-Gross Weight: ${data.grossWeight}
-Net Weight: ${data.netWeight}
-Stone: ${data.stones}
-Gold Rate: ${data.goldRate}
-Approx Price: ${data.approxPrice}`;
+    // Format data for QR code - text only, no URLs
+    const qrData = `🏷️ PALANIAPPA JEWELLERS
+📋 Product Code: ${data.productCode}
+💍 Product Name: ${data.productName}
+⚖️ Purity: ${data.purity}
+📊 Gross Weight: ${data.grossWeight}
+📈 Net Weight: ${data.netWeight}
+💎 Stone: ${data.stones}
+📉 Gold Rate: ${data.goldRate}
+💰 Approx Price: ${data.approxPrice}
+
+📞 Contact: +91 95972 01554
+💬 WhatsApp: +91 95972 01554`;
 
     // Generate QR code
     const filename = `qr-${productCode.replace(/[^a-zA-Z0-9]/g, '_')}-${Date.now()}.png`;
@@ -344,7 +348,6 @@ Approx Price: ${data.approxPrice}`;
       },
       errorCorrectionLevel: 'H', // High error correction for better print quality
       type: 'png',
-      quality: 0.92,
       scale: 8  // Higher scale for crisp printing
     });
 
