@@ -19,6 +19,7 @@ import { Currency } from '@/lib/currency';
 import { Package, FileText, TrendingUp, Users, Calculator, DollarSign, Edit, QrCode, Printer, Search, CheckSquare, Square } from 'lucide-react';
 import BarcodeDisplay from '@/components/barcode-display';
 import { useToast } from '@/hooks/use-toast';
+import QRCode from 'qrcode';
 
 export default function AdminDashboard() {
   const [location, setLocation] = useLocation();
@@ -65,120 +66,104 @@ export default function AdminDashboard() {
     const selectedProductsList = products.filter(p => selectedProducts.has(p.id) && p.productCode);
     if (selectedProductsList.length === 0) return;
 
-    const printWindow = window.open('', '_blank');
-    if (printWindow) {
-      // Create grid layout for multiple QR codes per page
-      const qrCodesPerRow = 2;
-      const qrCodesPerPage = 4; // 2x2 grid
+    try {
+      // Generate all QR codes as data URLs first (same as individual print)
+      const qrDataURLs: {[key: string]: string} = {};
       
-      let barcodesHTML = '';
-      for (let i = 0; i < selectedProductsList.length; i += qrCodesPerPage) {
-        const pageProducts = selectedProductsList.slice(i, i + qrCodesPerPage);
-        
-        barcodesHTML += `
-          <div style="page-break-after: ${i + qrCodesPerPage < selectedProductsList.length ? 'always' : 'auto'}; padding: 20px; min-height: 100vh; display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 20px;">
-        `;
-        
-        pageProducts.forEach((product, index) => {
-          const productType = product.name.split(' ')[0].toUpperCase();
-          barcodesHTML += `
-            <div style="border: 2px solid #000; border-radius: 10px; padding: 20px; width: 320px; text-align: center; background: white; position: relative; font-family: Arial, sans-serif;">
-              <div style="position: absolute; top: 8px; right: 8px; width: 12px; height: 12px; display: flex; align-items: center; justify-content: center; color: #000 !important; font-size: 12px; font-weight: bold; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; color-adjust: exact !important;">●</div>
-              <div style="font-size: 14px; font-weight: bold; margin-bottom: 8px; letter-spacing: 1px;">PALANIAPPA JEWELLERS</div>
-              <div style="font-size: 18px; font-weight: bold; margin-bottom: 8px; font-family: monospace;">${product.productCode}</div>
-              <div style="font-size: 14px; font-weight: bold; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;">
-                <span>${productType}</span>
-                <span>${product.purity || '22K'}</span>
-              </div>
-              <div style="font-size: 12px; font-weight: bold; margin-bottom: 12px;">Gross Weight : ${product.grossWeight} g</div>
-              <div style="margin: 12px 0; display: flex; justify-content: center;">
-                <canvas id="qrcode-${product.id}" style="width: 120px; height: 120px;"></canvas>
-              </div>
-              <div style="font-size: 14px; font-weight: bold; margin-top: 8px; font-family: monospace;">${product.productCode}</div>
-            </div>
-          `;
-        });
-        
-        barcodesHTML += '</div>';
-      }
-
-      printWindow.document.write(`
-        <html>
-          <head>
-            <title>Selected Product QR Codes</title>
-            <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
-            <style>
-              @page { size: A4; margin: 0.5in; }
-              body { margin: 0; padding: 0; }
-            </style>
-          </head>
-          <body>
-            ${barcodesHTML}
-            <script>
-              function generateQRCodes() {
-                if (typeof QRCode === 'undefined') {
-                  console.log('QRCode library not loaded, retrying...');
-                  setTimeout(generateQRCodes, 100);
-                  return;
-                }
-                
-                ${selectedProductsList.map(product => `
-                  try {
-                    const qrData${product.id} = \`🏷️ PALANIAPPA JEWELLERS
+      for (const product of selectedProductsList) {
+        const qrData = `🏷️ PALANIAPPA JEWELLERS
 📋 Product Code: ${product.productCode}
 💍 Product Name: ${product.name}
 ⚖️ Purity: ${product.purity || '22K'}
 📊 Gross Weight: ${product.grossWeight} g
 📈 Net Weight: ${product.netWeight} g
 💎 Stone: ${product.stones || 'None'}
-📉 Gold Rate: ${product.goldRateAtCreation ? '₹' + product.goldRateAtCreation + '/g' : 'N/A'}
+📉 Gold Rate: ${product.goldRateAtCreation ? `₹${product.goldRateAtCreation}/g` : 'N/A'}
 💰 Approx Price: ₹${parseInt(product.priceInr).toLocaleString('en-IN')}
 
 📞 Contact: +91 95972 01554
-💬 WhatsApp: +91 95972 01554\`;
-                    
-                    const canvas = document.getElementById("qrcode-${product.id}");
-                    if (canvas) {
-                      QRCode.toCanvas(canvas, qrData${product.id}, {
-                        width: 120,
-                        height: 120,
-                        margin: 2,
-                        color: {
-                          dark: '#000000',
-                          light: '#FFFFFF'
-                        },
-                        errorCorrectionLevel: 'M'
-                      }, function(error) {
-                        if (error) {
-                          console.error('QR Code generation error for ${product.id}:', error);
-                        } else {
-                          console.log('QR Code generated successfully for ${product.id}');
-                        }
-                      });
-                    }
-                  } catch (error) {
-                    console.error('Error generating QR for ${product.id}:', error);
-                  }
-                `).join('')}
-                
-                // Wait for all QR codes to generate, then print
+💬 WhatsApp: +91 95972 01554`;
+
+        // Generate QR code as data URL (same method as individual print)
+        const qrCodeDataURL = await QRCode.toDataURL(qrData, {
+          width: 120,
+          margin: 2,
+          color: {
+            dark: '#000000',
+            light: '#FFFFFF'
+          },
+          errorCorrectionLevel: 'M',
+          scale: 4
+        });
+        
+        qrDataURLs[product.id] = qrCodeDataURL;
+      }
+
+      // Now create the print window with pre-generated QR codes as images
+      const printWindow = window.open('', '_blank');
+      if (printWindow) {
+        const qrCodesPerPage = 4; // 2x2 grid
+        
+        let barcodesHTML = '';
+        for (let i = 0; i < selectedProductsList.length; i += qrCodesPerPage) {
+          const pageProducts = selectedProductsList.slice(i, i + qrCodesPerPage);
+          
+          barcodesHTML += `
+            <div style="page-break-after: ${i + qrCodesPerPage < selectedProductsList.length ? 'always' : 'auto'}; padding: 20px; min-height: 100vh; display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 20px;">
+          `;
+          
+          pageProducts.forEach((product) => {
+            const productType = product.name.split(' ')[0].toUpperCase();
+            barcodesHTML += `
+              <div style="border: 2px solid #000; border-radius: 10px; padding: 20px; width: 320px; text-align: center; background: white; position: relative; font-family: Arial, sans-serif;">
+                <div style="position: absolute; top: 8px; right: 8px; width: 12px; height: 12px; display: flex; align-items: center; justify-content: center; color: #000 !important; font-size: 12px; font-weight: bold; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; color-adjust: exact !important;">●</div>
+                <div style="font-size: 14px; font-weight: bold; margin-bottom: 8px; letter-spacing: 1px;">PALANIAPPA JEWELLERS</div>
+                <div style="font-size: 18px; font-weight: bold; margin-bottom: 8px; font-family: monospace;">${product.productCode}</div>
+                <div style="font-size: 14px; font-weight: bold; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;">
+                  <span>${productType}</span>
+                  <span>${product.purity || '22K'}</span>
+                </div>
+                <div style="font-size: 12px; font-weight: bold; margin-bottom: 12px;">Gross Weight : ${product.grossWeight} g</div>
+                <div style="margin: 12px 0; display: flex; justify-content: center;">
+                  <img src="${qrDataURLs[product.id]}" style="width: 120px; height: 120px;" alt="QR Code">
+                </div>
+                <div style="font-size: 14px; font-weight: bold; margin-top: 8px; font-family: monospace;">${product.productCode}</div>
+              </div>
+            `;
+          });
+          
+          barcodesHTML += '</div>';
+        }
+
+        printWindow.document.write(`
+          <html>
+            <head>
+              <title>Selected Product QR Codes</title>
+              <style>
+                @page { size: A4; margin: 0.5in; }
+                body { margin: 0; padding: 0; }
+              </style>
+            </head>
+            <body>
+              ${barcodesHTML}
+              <script>
                 setTimeout(() => {
                   window.print();
                   setTimeout(() => window.close(), 500);
-                }, 2000);
-              }
-              
-              // Start generating QR codes when page loads
-              if (document.readyState === 'loading') {
-                document.addEventListener('DOMContentLoaded', generateQRCodes);
-              } else {
-                generateQRCodes();
-              }
-            </script>
-          </body>
-        </html>
-      `);
-      printWindow.document.close();
+                }, 500);
+              </script>
+            </body>
+          </html>
+        `);
+        printWindow.document.close();
+      }
+    } catch (error) {
+      console.error('Error generating QR codes:', error);
+      toast({
+        title: "Error",
+        description: "Failed to generate QR codes for printing",
+        variant: "destructive",
+      });
     }
   };
 
