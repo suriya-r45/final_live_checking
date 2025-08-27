@@ -117,9 +117,12 @@ export function BarcodeDisplay({ product, className }: BarcodeDisplayProps) {
                   right: 12px;
                   width: 18px;
                   height: 18px;
-                  background-color: #000;
+                  background-color: #000 !important;
                   border-radius: 50%;
                   z-index: 10;
+                  -webkit-print-color-adjust: exact !important;
+                  print-color-adjust: exact !important;
+                  color-adjust: exact !important;
                 }
                 .store-name { 
                   font-size: 18px; 

@@ -16,7 +16,7 @@ import OrderTracking from '@/components/admin/order-tracking';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Product, Bill } from '@shared/schema';
 import { Currency } from '@/lib/currency';
-import { Package, FileText, TrendingUp, Users, Calculator, DollarSign, Edit, QrCode, Printer, Search } from 'lucide-react';
+import { Package, FileText, TrendingUp, Users, Calculator, DollarSign, Edit, QrCode, Printer, Search, CheckSquare, Square } from 'lucide-react';
 import BarcodeDisplay from '@/components/barcode-display';
 import { useToast } from '@/hooks/use-toast';
 
@@ -37,6 +37,120 @@ export default function AdminDashboard() {
   const [selectedBill, setSelectedBill] = useState<Bill | null>(null);
   const [productSearchTerm, setProductSearchTerm] = useState('');
   const [billSearchTerm, setBillSearchTerm] = useState('');
+  const [selectedProducts, setSelectedProducts] = useState<Set<string>>(new Set());
+
+  // Helper functions for product selection
+  const handleProductSelect = (productId: string) => {
+    const newSelected = new Set(selectedProducts);
+    if (newSelected.has(productId)) {
+      newSelected.delete(productId);
+    } else {
+      newSelected.add(productId);
+    }
+    setSelectedProducts(newSelected);
+  };
+
+  const handleSelectAll = () => {
+    const productsWithQR = products.filter(p => p.productCode);
+    setSelectedProducts(new Set(productsWithQR.map(p => p.id)));
+  };
+
+  const handleClearSelection = () => {
+    setSelectedProducts(new Set());
+  };
+
+  const printSelectedQRCodes = async () => {
+    if (selectedProducts.size === 0) return;
+    
+    const selectedProductsList = products.filter(p => selectedProducts.has(p.id) && p.productCode);
+    if (selectedProductsList.length === 0) return;
+
+    const printWindow = window.open('', '_blank');
+    if (printWindow) {
+      // Create grid layout for multiple QR codes per page
+      const qrCodesPerRow = 2;
+      const qrCodesPerPage = 4; // 2x2 grid
+      
+      let barcodesHTML = '';
+      for (let i = 0; i < selectedProductsList.length; i += qrCodesPerPage) {
+        const pageProducts = selectedProductsList.slice(i, i + qrCodesPerPage);
+        
+        barcodesHTML += `
+          <div style="page-break-after: ${i + qrCodesPerPage < selectedProductsList.length ? 'always' : 'auto'}; padding: 20px; min-height: 100vh; display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 20px;">
+        `;
+        
+        pageProducts.forEach((product, index) => {
+          const productType = product.name.split(' ')[0].toUpperCase();
+          barcodesHTML += `
+            <div style="border: 2px solid #000; border-radius: 10px; padding: 20px; width: 320px; text-align: center; background: white; position: relative; font-family: Arial, sans-serif;">
+              <div style="position: absolute; top: 8px; right: 8px; width: 12px; height: 12px; background-color: #000; border-radius: 50%; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; color-adjust: exact !important;"></div>
+              <div style="font-size: 14px; font-weight: bold; margin-bottom: 8px; letter-spacing: 1px;">PALANIAPPA JEWELLERS</div>
+              <div style="font-size: 18px; font-weight: bold; margin-bottom: 8px; font-family: monospace;">${product.productCode}</div>
+              <div style="font-size: 14px; font-weight: bold; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;">
+                <span>${productType}</span>
+                <span>${product.purity || '22K'}</span>
+              </div>
+              <div style="font-size: 12px; font-weight: bold; margin-bottom: 12px;">Gross Weight : ${product.grossWeight} g</div>
+              <div style="margin: 12px 0; display: flex; justify-content: center;">
+                <canvas id="qrcode-${product.id}" style="width: 120px; height: 120px;"></canvas>
+              </div>
+              <div style="font-size: 14px; font-weight: bold; margin-top: 8px; font-family: monospace;">${product.productCode}</div>
+            </div>
+          `;
+        });
+        
+        barcodesHTML += '</div>';
+      }
+
+      printWindow.document.write(`
+        <html>
+          <head>
+            <title>Selected Product QR Codes</title>
+            <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+            <style>
+              @page { size: A4; margin: 0.5in; }
+              body { margin: 0; padding: 0; }
+            </style>
+          </head>
+          <body>
+            ${barcodesHTML}
+            <script>
+              ${selectedProductsList.map(product => `
+                const qrData${product.id} = \`🏷️ PALANIAPPA JEWELLERS
+📋 Product Code: ${product.productCode}
+💍 Product Name: ${product.name}
+⚖️ Purity: ${product.purity || '22K'}
+📊 Gross Weight: ${product.grossWeight} g
+📈 Net Weight: ${product.netWeight} g
+💎 Stone: ${product.stones || 'None'}
+📉 Gold Rate: ${product.goldRateAtCreation ? `₹${product.goldRateAtCreation}/g` : 'N/A'}
+💰 Approx Price: ₹${parseInt(product.priceInr).toLocaleString('en-IN')}
+
+📞 Contact: +91 95972 01554
+💬 WhatsApp: +91 95972 01554\`;
+                
+                QRCode.toCanvas(document.getElementById("qrcode-${product.id}"), qrData${product.id}, {
+                  width: 120,
+                  margin: 4,
+                  color: {
+                    dark: '#000000',
+                    light: '#FFFFFF'
+                  },
+                  errorCorrectionLevel: 'H',
+                  scale: 6
+                });
+              `).join('')}
+              setTimeout(() => {
+                window.print();
+                window.close();
+              }, 1000);
+            </script>
+          </body>
+        </html>
+      `);
+      printWindow.document.close();
+    }
+  };
 
   useEffect(() => {
     if (!isAdmin && !token) {
@@ -467,7 +581,21 @@ export default function AdminDashboard() {
                             product.name.toLowerCase().includes(productSearchTerm.toLowerCase())
                           )
                           .map((product) => (
-                          <div key={product.id} className="bg-white border rounded-lg shadow-sm">
+                          <div key={product.id} className="bg-white border rounded-lg shadow-sm relative">
+                            {/* Selection Checkbox */}
+                            {product.productCode && (
+                              <div className="absolute top-3 left-3 z-10">
+                                <button
+                                  onClick={() => handleProductSelect(product.id)}
+                                  className="flex items-center justify-center w-6 h-6 border-2 border-gray-400 rounded hover:border-rose-500 transition-colors"
+                                  style={{ backgroundColor: selectedProducts.has(product.id) ? '#be185d' : 'white' }}
+                                >
+                                  {selectedProducts.has(product.id) && (
+                                    <CheckSquare className="w-4 h-4 text-white" />
+                                  )}
+                                </button>
+                              </div>
+                            )}
                             <div className="p-4">
                               <div className="flex items-start gap-3 mb-4">
                                 <img
@@ -549,9 +677,42 @@ export default function AdminDashboard() {
                         ))}
                       </div>
                       
-                      {/* Bulk Actions */}
+                      {/* Selection Controls */}
                       <div className="border-t pt-6">
+                        <div className="flex flex-wrap items-center gap-3 mb-4">
+                          <div className="text-sm text-gray-600">
+                            {selectedProducts.size} of {products.filter(p => p.productCode).length} selected
+                          </div>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={handleSelectAll}
+                            disabled={products.filter(p => p.productCode).length === 0}
+                          >
+                            Select All
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={handleClearSelection}
+                            disabled={selectedProducts.size === 0}
+                          >
+                            Clear Selection
+                          </Button>
+                        </div>
+
+                        {/* Bulk Actions */}
                         <div className="flex flex-wrap gap-3">
+                          <Button 
+                            variant="default"
+                            onClick={printSelectedQRCodes}
+                            disabled={selectedProducts.size === 0}
+                            className="bg-rose-600 hover:bg-rose-700"
+                          >
+                            <Printer className="h-4 w-4 mr-2" />
+                            Print Selected QR Codes ({selectedProducts.size})
+                          </Button>
+
                           <Button 
                             variant="outline"
                             onClick={() => {
