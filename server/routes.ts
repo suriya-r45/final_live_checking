@@ -1250,6 +1250,18 @@ Premium quality, timeless beauty.`;
         // Don't fail the order creation if shipment creation fails
       }
 
+      // Send WhatsApp notification to admin about new order
+      try {
+        await sendAdminOrderNotification({
+          ...bill,
+          ...orderData
+        });
+        console.log(`[New Order] Admin notification sent for Order ${orderNumber}`);
+      } catch (error) {
+        console.error(`[New Order] Failed to send admin notification for Order ${orderNumber}:`, error);
+        // Don't fail the order creation if notification fails
+      }
+
       res.status(201).json({
         orderNumber: bill.billNumber,
         ...bill
