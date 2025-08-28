@@ -14,7 +14,7 @@ export default function CartButton() {
       <Button
         variant="ghost"
         onClick={() => setIsOpen(true)}
-        className="relative p-2 text-gray-800 hover:bg-gray-100 rounded-lg transition-all duration-200"
+        className="relative p-2 text-amber-900 hover:bg-gray-100 rounded-lg transition-all duration-200"
         data-testid="button-cart"
       >
         <ShoppingCart className="h-6 w-6" />
