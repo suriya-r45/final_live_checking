@@ -111,7 +111,7 @@ export default function BillPreview({ bill, onClose }: BillPreviewProps) {
                 <p>123 Jewelry Street</p>
                 <p>Chennai, Tamil Nadu</p>
                 <p>PINCODE: 600001</p>
-                <p>Phone Number: +919942061393</p>
+                <p>Phone Number: +919597201554</p>
                 <p>GSTIN: 33AAACT5712A124</p>
                 <p>Email: jewelerypalaniappa@gmail.com</p>
               </div>

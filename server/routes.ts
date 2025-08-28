@@ -61,7 +61,7 @@ async function sendWelcomeWhatsAppMessage(name: string, phone: string) {
 
 // Function to send WhatsApp notification to admin for new orders
 async function sendAdminOrderNotification(billData: any) {
-  const adminPhone = "+919942061393"; // Admin WhatsApp number
+  const adminPhone = "+919597201554"; // Admin WhatsApp number
   
   const message = `🔔 NEW ORDER RECEIVED!
 
@@ -123,7 +123,7 @@ Please do not share this OTP with anyone.
 If you didn't request this, please ignore this message.
 
 Palaniappa Jewellers
-Contact: +919942061393`;
+Contact: +919597201554`;
 
   try {
     // Format phone number (ensure it starts with +)
@@ -769,7 +769,7 @@ VAT: ${currencySymbol}${parseFloat(bill.vat).toLocaleString()}
 Thank you for choosing Palaniappa Jewellers!
 Where every jewel is crafted for elegance that lasts generations.
 
-Contact us: +919942061393
+Contact us: +919597201554
 Premium quality, timeless beauty.`;
 
       // Create WhatsApp URL
@@ -897,7 +897,7 @@ Premium quality, timeless beauty.`;
          .text('123 Jewelry Street', margin + 8, detailsY + 38)
          .text('Chennai, Tamil Nadu', margin + 8, detailsY + 51)
          .text('PINCODE: 600001', margin + 8, detailsY + 64)
-         .text('Phone Number: +919942061393', margin + 8, detailsY + 77)
+         .text('Phone Number: +919597201554', margin + 8, detailsY + 77)
          .text('GSTIN: 33AAACT5712A124', margin + 8, detailsY + 90)
          .text('Email: jewelerypalaniappa@gmail.com', margin + 8, detailsY + 103);
 
@@ -1224,7 +1224,7 @@ Premium quality, timeless beauty.`;
           senderState: "Tamil Nadu",
           senderCountry: "India",
           senderPostalCode: "636001",
-          senderPhone: "+919942061393",
+          senderPhone: "+919597201554",
           recipientName: orderData.customerName,
           recipientAddress: orderData.customerAddress,
           recipientCity: "Unknown", // We'll improve this later with better address parsing

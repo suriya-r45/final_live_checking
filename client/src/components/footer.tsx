@@ -56,14 +56,14 @@ export default function Footer() {
             <h4 className="text-lg font-semibold mb-4 text-white">Contact Info</h4>
             <div className="space-y-2 text-sm text-white">
               <a 
-                href="https://wa.me/919942061393?text=Hi!%20I'm%20interested%20in%20your%20jewelry%20collection.%20Could%20you%20please%20help%20me%20with%20more%20information?"
+                href="https://wa.me/919597201554?text=Hi!%20I'm%20interested%20in%20your%20jewelry%20collection.%20Could%20you%20please%20help%20me%20with%20more%20information?"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center space-x-2 text-white hover:text-green-400 transition-colors cursor-pointer" 
                 data-testid="link-whatsapp-phone"
               >
                 <FaWhatsapp className="h-4 w-4 text-green-500" />
-                <span className="text-green-400">+91 994 206 1393</span>
+                <span className="text-green-400">+91 959 720 1554</span>
               </a>
               <a
                 href="https://instagram.com/palaniappa.bh"

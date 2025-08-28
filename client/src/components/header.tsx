@@ -52,7 +52,7 @@ export default function Header({ selectedCurrency, onCurrencyChange }: HeaderPro
                 variant="ghost"
                 size="sm"
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                className="md:hidden p-2 text-amber-900 hover:bg-gray-100"
+                className="md:hidden p-2 text-black hover:bg-gray-100"
               >
                 <Menu className="h-6 w-6" />
               </Button>
@@ -67,8 +67,8 @@ export default function Header({ selectedCurrency, onCurrencyChange }: HeaderPro
                   />
                 </div>
                 <div>
-                  <h1 className="text-lg md:text-2xl font-bold text-amber-900 tracking-wide">PALANIAPPA JEWELLERS</h1>
-                  <p className="text-xs text-gray-600 font-medium">Since 2025</p>
+                  <h1 className="text-lg md:text-2xl font-bold text-black tracking-wide">PALANIAPPA JEWELLERS</h1>
+                  <p className="text-xs text-black font-medium">Since 2025</p>
                 </div>
               </Link>
             </div>
@@ -77,7 +77,7 @@ export default function Header({ selectedCurrency, onCurrencyChange }: HeaderPro
             <div className="flex items-center space-x-2 md:space-x-4">
               {/* Currency Selection */}
               <Select value={selectedCurrency} onValueChange={onCurrencyChange} data-testid="select-currency">
-                <SelectTrigger className="bg-transparent border-0 text-amber-900 hover:text-amber-700 p-0 h-auto transition-colors duration-200 w-16 md:w-20">
+                <SelectTrigger className="bg-transparent border-0 text-black hover:text-gray-700 p-0 h-auto transition-colors duration-200 w-16 md:w-20">
                   <div className="flex flex-col items-center cursor-pointer w-full">
                     <span className="text-[8px] md:text-xs whitespace-nowrap mb-0.5">Country</span>
                     <div className="text-center text-[9px] md:text-xs font-medium">
@@ -116,7 +116,7 @@ export default function Header({ selectedCurrency, onCurrencyChange }: HeaderPro
                   <div className="flex items-center space-x-1 md:space-x-2">
                     {isAdmin && (
                       <Link href="/admin">
-                        <Button variant="ghost" size="sm" className="text-amber-900 hover:text-amber-700 hover:bg-gray-100 transition-all duration-200 px-2 py-1" data-testid="button-admin-dashboard">
+                        <Button variant="ghost" size="sm" className="text-black hover:text-gray-700 hover:bg-gray-100 transition-all duration-200 px-2 py-1" data-testid="button-admin-dashboard">
                           <span className="text-xs">Dashboard</span>
                         </Button>
                       </Link>
@@ -125,7 +125,7 @@ export default function Header({ selectedCurrency, onCurrencyChange }: HeaderPro
                       variant="ghost"
                       size="sm"
                       onClick={handleLogout}
-                      className="p-2 text-amber-900 hover:text-amber-700 hover:bg-gray-100 rounded-lg transition-all duration-200"
+                      className="p-2 text-black hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-all duration-200"
                       data-testid="button-logout"
                     >
                       <LogOut className="h-6 w-6" />
@@ -134,7 +134,7 @@ export default function Header({ selectedCurrency, onCurrencyChange }: HeaderPro
                 ) : (
                   <Link href="/login">
                     <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors duration-200">
-                      <User className="h-6 w-6 text-amber-900" />
+                      <User className="h-6 w-6 text-black" />
                     </button>
                   </Link>
                 )}
@@ -142,7 +142,7 @@ export default function Header({ selectedCurrency, onCurrencyChange }: HeaderPro
 
               {/* Wishlist Heart */}
               <button className="p-2 hover:bg-gray-100 rounded-lg">
-                <Heart className="h-6 w-6 text-amber-900" />
+                <Heart className="h-6 w-6 text-black" />
               </button>
 
               {/* Cart with Badge */}
@@ -157,7 +157,7 @@ export default function Header({ selectedCurrency, onCurrencyChange }: HeaderPro
             <div className="max-w-4xl mx-auto">
               <div className="relative">
                 <div className="absolute left-4 top-1/2 transform -translate-y-1/2">
-                  <Search className="h-5 w-5 text-amber-900" />
+                  <Search className="h-5 w-5 text-black" />
                 </div>
                 <Input
                   type="text"
@@ -165,15 +165,15 @@ export default function Header({ selectedCurrency, onCurrencyChange }: HeaderPro
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   onKeyPress={handleSearchKeyPress}
-                  className="w-full h-12 pl-12 pr-20 rounded-full bg-gray-50 border-gray-200 text-amber-900 placeholder-gray-500 focus:bg-white focus:ring-2 focus:ring-amber-200 focus:border-amber-300"
+                  className="w-full h-12 pl-12 pr-20 rounded-full bg-gray-50 border-gray-200 text-black placeholder-gray-500 focus:bg-white focus:ring-2 focus:ring-gray-200 focus:border-gray-300"
                   data-testid="search-input"
                 />
                 <div className="absolute right-4 top-1/2 transform -translate-y-1/2 flex items-center space-x-2">
                   <button className="p-1 hover:bg-gray-200 rounded">
-                    <Camera className="h-5 w-5 text-amber-900" />
+                    <Camera className="h-5 w-5 text-black" />
                   </button>
                   <button className="p-1 hover:bg-gray-200 rounded">
-                    <Mic className="h-5 w-5 text-amber-900" />
+                    <Mic className="h-5 w-5 text-black" />
                   </button>
                 </div>
               </div>

@@ -221,7 +221,7 @@ export default function Home() {
       <section className="pt-6 pb-8" data-testid="section-categories" style={{ background: 'linear-gradient(135deg, #fefdfb 0%, #fef9f4 100%)' }}>
         <div className="container mx-auto px-4">
           <div className="text-center mb-6">
-            <h2 className="text-lg sm:text-2xl md:text-4xl font-bold" style={{ color: '#8b4513' }}>Explore Our Collections</h2>
+            <h2 className="text-lg sm:text-2xl md:text-4xl font-bold text-black">Explore Our Collections</h2>
           </div>
           
           {/* Category Carousel */}
