@@ -47,12 +47,12 @@ export default function Header({ selectedCurrency, onCurrencyChange }: HeaderPro
           <div className="flex items-center justify-between h-16 md:h-20">
             {/* Left Section - Mobile Menu & Brand */}
             <div className="flex items-center space-x-4">
-              {/* Hamburger Menu */}
+              {/* Hamburger Menu - Mobile Only */}
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                className="p-2 text-gray-800 hover:bg-gray-100"
+                className="md:hidden p-2 text-gray-800 hover:bg-gray-100"
               >
                 <Menu className="h-6 w-6" />
               </Button>
