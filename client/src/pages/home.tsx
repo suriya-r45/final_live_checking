@@ -10,7 +10,7 @@ import { Product, HomeSection, HomeSectionItem } from '@shared/schema';
 import { Currency } from '@/lib/currency';
 import { ProductFilters as IProductFilters } from '@shared/cart-schema';
 import { ArrowRight, Star, Sparkles, Crown, Gem, Heart, Watch, Users, Baby, Palette, Wrench } from "lucide-react";
-import ringsImage from '@assets/rings_luxury.png';
+import ringsImage from '@assets/rings-new.png';
 
 interface HomeSectionWithItems extends HomeSection {
   items: HomeSectionItemWithProduct[];
@@ -20,7 +20,7 @@ interface HomeSectionItemWithProduct extends HomeSectionItem {
   product: Product;
 }
 import pendantsImage from '@assets/pendants_luxury.png';
-import earringsImage from '@assets/earrings_luxury.png';
+import earringsImage from '@assets/earrings-new.png';
 import braceletsImage from '@assets/bracelets_luxury.png';
 import necklacesImage from '@assets/necklaces_luxury_new.png';
 import chainsImage from '@assets/chains_luxury.png';
@@ -243,7 +243,7 @@ export default function Home() {
                   <div className="flex flex-col items-center">
                     {/* Category Image */}
                     <div 
-                      className="w-24 h-24 md:w-32 md:h-32 rounded-lg shadow-lg overflow-hidden mb-3"
+                      className="w-24 h-24 md:w-32 md:h-32 rounded-full shadow-lg overflow-hidden mb-3 border-2 border-black"
                       style={{
                         backgroundImage: `url(${category.image})`,
                         backgroundSize: 'cover',
