@@ -370,8 +370,7 @@ function ProductForm({ currency }: ProductFormProps) {
   }, [formData.material, formData.subCategory]);
 
   return (
-    <div>
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+    <div className="space-y-8">
       {/* Add Product Form */}
       <Card data-testid="card-add-product">
         <CardHeader>
@@ -735,7 +734,6 @@ function ProductForm({ currency }: ProductFormProps) {
           </div>
         </CardContent>
       </Card>
-    </div>
     </div>
   );
 }
