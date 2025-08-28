@@ -1,10 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useLocation } from 'wouter';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/lib/auth';
-import Header from '@/components/header';
 import ProductForm from '@/components/admin/product-form';
 import BillingForm from '@/components/admin/billing-form';
 import BillPreview from '@/components/admin/bill-preview';
@@ -16,7 +14,28 @@ import OrderTracking from '@/components/admin/order-tracking';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Product, Bill } from '@shared/schema';
 import { Currency } from '@/lib/currency';
-import { Package, FileText, TrendingUp, Users, Calculator, DollarSign, Edit, QrCode, Printer, Search, CheckSquare, Square } from 'lucide-react';
+import { 
+  Package, 
+  FileText, 
+  TrendingUp, 
+  Users, 
+  Calculator, 
+  QrCode, 
+  Printer, 
+  Search, 
+  CheckSquare, 
+  Square,
+  Home,
+  Plus,
+  Receipt,
+  History,
+  ClipboardList,
+  Settings,
+  Tag,
+  BarChart3,
+  Grid3X3,
+  User
+} from 'lucide-react';
 import BarcodeDisplay from '@/components/barcode-display';
 import { useToast } from '@/hooks/use-toast';
 import QRCode from 'qrcode';
@@ -27,7 +46,7 @@ export default function AdminDashboard() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [selectedCurrency, setSelectedCurrency] = useState<Currency>('INR');
-  const [activeTab, setActiveTab] = useState(() => {
+  const [activeSection, setActiveSection] = useState(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const tabParam = urlParams.get('tab');
     if (tabParam === 'products' || tabParam === 'billing' || tabParam === 'bills' || tabParam === 'estimates' || tabParam === 'categories' || tabParam === 'pricing' || tabParam === 'barcodes' || tabParam === 'home-sections' || tabParam === 'orders') {
@@ -173,38 +192,6 @@ export default function AdminDashboard() {
     }
   }, [isAdmin, token]);
 
-  // Handle URL tab parameter
-  useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const tabParam = urlParams.get('tab');
-    if (tabParam === 'products' || tabParam === 'billing' || tabParam === 'bills' || tabParam === 'estimates' || tabParam === 'categories' || tabParam === 'pricing' || tabParam === 'barcodes' || tabParam === 'home-sections' || tabParam === 'orders') {
-      setActiveTab(tabParam);
-    }
-  }, []);
-
-  // Listen for URL changes
-  useEffect(() => {
-    const handlePopState = () => {
-      const urlParams = new URLSearchParams(window.location.search);
-      const tabParam = urlParams.get('tab');
-      if (tabParam === 'products' || tabParam === 'billing' || tabParam === 'bills' || tabParam === 'estimates' || tabParam === 'categories' || tabParam === 'pricing' || tabParam === 'barcodes' || tabParam === 'home-sections' || tabParam === 'orders') {
-        setActiveTab(tabParam);
-      }
-    };
-
-    window.addEventListener('popstate', handlePopState);
-    return () => window.removeEventListener('popstate', handlePopState);
-  }, []);
-
-  // Also check when location changes (for programmatic navigation)
-  useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const tabParam = urlParams.get('tab');
-    if (tabParam === 'products' || tabParam === 'billing' || tabParam === 'bills' || tabParam === 'estimates' || tabParam === 'categories' || tabParam === 'pricing' || tabParam === 'barcodes' || tabParam === 'home-sections' || tabParam === 'orders') {
-      setActiveTab(tabParam);
-    }
-  }, [location]);
-
   const { data: products = [] } = useQuery<Product[]>({
     queryKey: ['/api/products'],
     queryFn: async () => {
@@ -276,552 +263,407 @@ export default function AdminDashboard() {
     return null;
   }
 
-  return (
-    <div className="min-h-screen bg-white" data-testid="page-admin-dashboard" style={{ backgroundColor: '#ffffff' }}>
-      <Header 
-        selectedCurrency={selectedCurrency} 
-        onCurrencyChange={setSelectedCurrency} 
-      />
+  const navigation = [
+    { id: 'dashboard', name: 'Dashboard', icon: Home },
+    { id: 'products', name: 'Add Product', icon: Plus },
+    { id: 'billing', name: 'Billing', icon: Receipt },
+    { id: 'bills', name: 'Bill History', icon: History },
+    { id: 'estimates', name: 'Customer Estimates', icon: ClipboardList },
+    { id: 'barcodes', name: 'QR Code Management', icon: QrCode },
+    { id: 'pricing', name: 'Pricing', icon: BarChart3 },
+    { id: 'categories', name: 'Categories', icon: Tag },
+    { id: 'home-sections', name: 'Home Section', icon: Grid3X3 },
+  ];
 
-      <div className="container mx-auto px-3 md:px-4 py-4 md:py-8">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 md:mb-8 gap-4">
-          <div>
-            <h1 className="text-2xl md:text-3xl font-bold text-rose-900">Admin Dashboard</h1>
-          </div>
-          <Button
-            onClick={() => setLocation('/estimates')}
-            className="bg-gradient-to-r from-rose-800 to-red-800 hover:from-rose-900 hover:to-red-900 text-white font-semibold shadow-md w-full sm:w-auto text-sm px-3 py-2"
-          >
-            <Calculator className="h-4 w-4 mr-2" />
-            Create Customer Estimate
-          </Button>
-        </div>
+  const renderContent = () => {
+    switch (activeSection) {
+      case 'dashboard':
+        return (
+          <div className="space-y-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              <Card className="bg-white shadow-lg border-0 hover:shadow-xl transition-all duration-300">
+                <CardContent className="p-6">
+                  <div className="flex items-center">
+                    <div className="bg-blue-50 p-3 rounded-lg">
+                      <Package className="h-8 w-8 text-blue-600" />
+                    </div>
+                    <div className="ml-4">
+                      <p className="text-sm font-medium text-gray-600">Total Products</p>
+                      <p className="text-2xl font-bold text-gray-900">{totalProducts}</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
 
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-8">
-          <Card data-testid="card-total-products" className="bg-white shadow-lg border-0 hover:shadow-xl transition-all duration-300">
-            <CardContent className="p-4 md:p-6">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center">
-                  <div className="bg-blue-50 p-3 rounded-lg">
-                    <Package className="h-6 w-6 md:h-8 md:w-8 text-blue-600" />
+              <Card className="bg-white shadow-lg border-0 hover:shadow-xl transition-all duration-300">
+                <CardContent className="p-6">
+                  <div className="flex items-center">
+                    <div className="bg-green-50 p-3 rounded-lg">
+                      <FileText className="h-8 w-8 text-green-600" />
+                    </div>
+                    <div className="ml-4">
+                      <p className="text-sm font-medium text-gray-600">Total Bills</p>
+                      <p className="text-2xl font-bold text-gray-900">{bills.length}</p>
+                    </div>
                   </div>
-                  <div className="ml-3 md:ml-4">
-                    <p className="text-xs md:text-sm font-medium text-gray-600">Total Products</p>
-                    <p className="text-xl md:text-2xl font-bold text-gray-900">{totalProducts}</p>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+                </CardContent>
+              </Card>
 
-          <Card data-testid="card-total-bills" className="bg-white shadow-lg border-0 hover:shadow-xl transition-all duration-300">
-            <CardContent className="p-4 md:p-6">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center">
-                  <div className="bg-green-50 p-3 rounded-lg">
-                    <FileText className="h-6 w-6 md:h-8 md:w-8 text-green-600" />
+              <Card className="bg-white shadow-lg border-0 hover:shadow-xl transition-all duration-300">
+                <CardContent className="p-6">
+                  <div className="flex items-center">
+                    <div className="bg-yellow-50 p-3 rounded-lg">
+                      <TrendingUp className="h-8 w-8 text-yellow-600" />
+                    </div>
+                    <div className="ml-4">
+                      <p className="text-sm font-medium text-gray-600">Total Revenue</p>
+                      <p className="text-2xl font-bold text-gray-900">
+                        {selectedCurrency === 'INR' ? '₹' : 'BD'} {totalRevenue.toLocaleString()}
+                      </p>
+                    </div>
                   </div>
-                  <div className="ml-3 md:ml-4">
-                    <p className="text-xs md:text-sm font-medium text-gray-600">Total Bills</p>
-                    <p className="text-xl md:text-2xl font-bold text-gray-900">{bills.length}</p>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+                </CardContent>
+              </Card>
 
-          <Card data-testid="card-total-revenue" className="bg-white shadow-lg border-0 hover:shadow-xl transition-all duration-300">
-            <CardContent className="p-4 md:p-6">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center">
-                  <div className="bg-yellow-50 p-3 rounded-lg">
-                    <TrendingUp className="h-6 w-6 md:h-8 md:w-8 text-yellow-600" />
+              <Card className="bg-white shadow-lg border-0 hover:shadow-xl transition-all duration-300">
+                <CardContent className="p-6">
+                  <div className="flex items-center">
+                    <div className="bg-red-50 p-3 rounded-lg">
+                      <Users className="h-8 w-8 text-red-600" />
+                    </div>
+                    <div className="ml-4">
+                      <p className="text-sm font-medium text-gray-600">Low Stock Items</p>
+                      <p className="text-2xl font-bold text-gray-900">{lowStockProducts}</p>
+                    </div>
                   </div>
-                  <div className="ml-3 md:ml-4">
-                    <p className="text-xs md:text-sm font-medium text-gray-600">Total Revenue</p>
-                    <p className="text-lg md:text-2xl font-bold text-gray-900">
-                      {selectedCurrency === 'INR' ? '₹' : 'BD'} {totalRevenue.toLocaleString()}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card data-testid="card-low-stock" className="bg-white shadow-lg border-0 hover:shadow-xl transition-all duration-300">
-            <CardContent className="p-4 md:p-6">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center">
-                  <div className="bg-red-50 p-3 rounded-lg">
-                    <Users className="h-6 w-6 md:h-8 md:w-8 text-red-600" />
-                  </div>
-                  <div className="ml-3 md:ml-4">
-                    <p className="text-xs md:text-sm font-medium text-gray-600">Low Stock Items</p>
-                    <p className="text-xl md:text-2xl font-bold text-gray-900">{lowStockProducts}</p>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Main Tabs */}
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6" data-testid="tabs-admin">
-          <div className="relative">
-            {/* Mobile: Vertical scrollable tabs */}
-            <div className="md:hidden">
-              <div className="overflow-x-auto">
-                <TabsList className="grid w-full grid-cols-9 bg-gradient-to-r from-rose-50 to-red-50 border border-rose-200 shadow-md h-auto p-2 rounded-xl min-w-max">
-                  <TabsTrigger value="products" data-testid="tab-products" className="text-xs font-semibold text-rose-700 hover:text-rose-900 hover:bg-rose-100 data-[state=active]:bg-gradient-to-r data-[state=active]:from-rose-800 data-[state=active]:to-red-800 data-[state=active]:text-white data-[state=active]:shadow-lg transition-all duration-300 px-3 py-3 mx-1 rounded-lg min-h-[44px] flex items-center justify-center whitespace-nowrap">Products</TabsTrigger>
-                  <TabsTrigger value="billing" data-testid="tab-billing" className="text-xs font-semibold text-rose-700 hover:text-rose-900 hover:bg-rose-100 data-[state=active]:bg-gradient-to-r data-[state=active]:from-rose-800 data-[state=active]:to-red-800 data-[state=active]:text-white data-[state=active]:shadow-lg transition-all duration-300 px-3 py-3 mx-1 rounded-lg min-h-[44px] flex items-center justify-center whitespace-nowrap">Billing</TabsTrigger>
-                  <TabsTrigger value="bills" data-testid="tab-bills" className="text-xs font-medium text-rose-700 hover:text-rose-900 hover:bg-rose-100 data-[state=active]:bg-gradient-to-r data-[state=active]:from-rose-800 data-[state=active]:to-red-800 data-[state=active]:text-white data-[state=active]:shadow-lg transition-all duration-300 px-3 py-3 mx-1 rounded-lg min-h-[44px] flex items-center justify-center whitespace-nowrap">Bills History</TabsTrigger>
-                  <TabsTrigger value="estimates" data-testid="tab-estimates" className="text-xs font-medium text-rose-700 hover:text-rose-900 hover:bg-rose-100 data-[state=active]:bg-gradient-to-r data-[state=active]:from-rose-800 data-[state=active]:to-red-800 data-[state=active]:text-white data-[state=active]:shadow-lg transition-all duration-300 px-3 py-3 mx-1 rounded-lg min-h-[44px] flex items-center justify-center whitespace-nowrap">Estimates</TabsTrigger>
-                  <TabsTrigger value="categories" data-testid="tab-categories" className="text-xs font-medium text-rose-700 hover:text-rose-900 hover:bg-rose-100 data-[state=active]:bg-gradient-to-r data-[state=active]:from-rose-800 data-[state=active]:to-red-800 data-[state=active]:text-white data-[state=active]:shadow-lg transition-all duration-300 px-3 py-3 mx-1 rounded-lg min-h-[44px] flex items-center justify-center whitespace-nowrap">Categories</TabsTrigger>
-                  <TabsTrigger value="pricing" data-testid="tab-pricing" className="text-xs font-medium text-rose-700 hover:text-rose-900 hover:bg-rose-100 data-[state=active]:bg-gradient-to-r data-[state=active]:from-rose-800 data-[state=active]:to-red-800 data-[state=active]:text-white data-[state=active]:shadow-lg transition-all duration-300 px-3 py-3 mx-1 rounded-lg min-h-[44px] flex items-center justify-center whitespace-nowrap">Pricing</TabsTrigger>
-                  <TabsTrigger value="barcodes" data-testid="tab-barcodes" className="text-xs font-medium text-rose-700 hover:text-rose-900 hover:bg-rose-100 data-[state=active]:bg-gradient-to-r data-[state=active]:from-rose-800 data-[state=active]:to-red-800 data-[state=active]:text-white data-[state=active]:shadow-lg transition-all duration-300 px-3 py-3 mx-1 rounded-lg min-h-[44px] flex items-center justify-center whitespace-nowrap">QR Codes</TabsTrigger>
-                  <TabsTrigger value="home-sections" data-testid="tab-home-sections" className="text-xs font-medium text-rose-700 hover:text-rose-900 hover:bg-rose-100 data-[state=active]:bg-gradient-to-r data-[state=active]:from-rose-800 data-[state=active]:to-red-800 data-[state=active]:text-white data-[state=active]:shadow-lg transition-all duration-300 px-3 py-3 mx-1 rounded-lg min-h-[44px] flex items-center justify-center whitespace-nowrap">Home Sections</TabsTrigger>
-                  <TabsTrigger value="orders" data-testid="tab-orders" className="text-xs font-medium text-rose-700 hover:text-rose-900 hover:bg-rose-100 data-[state=active]:bg-gradient-to-r data-[state=active]:from-rose-800 data-[state=active]:to-red-800 data-[state=active]:text-white data-[state=active]:shadow-lg transition-all duration-300 px-3 py-3 mx-1 rounded-lg min-h-[44px] flex items-center justify-center whitespace-nowrap">Order Tracking</TabsTrigger>
-                </TabsList>
-              </div>
+                </CardContent>
+              </Card>
             </div>
-            
-            {/* Desktop: Original horizontal layout */}
-            <TabsList className="hidden md:grid w-full grid-cols-9 bg-gradient-to-r from-rose-50 to-red-50 border border-rose-200 shadow-sm h-auto p-1">
-              <TabsTrigger value="products" data-testid="tab-products" className="text-xs md:text-sm font-medium text-rose-700 hover:text-rose-900 hover:bg-rose-100 data-[state=active]:bg-gradient-to-r data-[state=active]:from-rose-800 data-[state=active]:to-red-800 data-[state=active]:text-white data-[state=active]:shadow-md transition-all duration-200 px-1 py-2 mx-0.5 rounded-md min-h-[40px] flex items-center justify-center">Products</TabsTrigger>
-              <TabsTrigger value="billing" data-testid="tab-billing" className="text-xs md:text-sm font-medium text-rose-700 hover:text-rose-900 hover:bg-rose-100 data-[state=active]:bg-gradient-to-r data-[state=active]:from-rose-800 data-[state=active]:to-red-800 data-[state=active]:text-white data-[state=active]:shadow-md transition-all duration-200 px-1 py-2 mx-0.5 rounded-md min-h-[40px] flex items-center justify-center">Billing</TabsTrigger>
-              <TabsTrigger value="bills" data-testid="tab-bills" className="text-xs md:text-sm font-medium text-rose-700 hover:text-rose-900 hover:bg-rose-100 data-[state=active]:bg-gradient-to-r data-[state=active]:from-rose-800 data-[state=active]:to-red-800 data-[state=active]:text-white data-[state=active]:shadow-md transition-all duration-200 px-1 py-2 mx-0.5 rounded-md min-h-[40px] flex items-center justify-center">Bills History</TabsTrigger>
-              <TabsTrigger value="estimates" data-testid="tab-estimates" className="text-xs md:text-sm font-medium text-rose-700 hover:text-rose-900 hover:bg-rose-100 data-[state=active]:bg-gradient-to-r data-[state=active]:from-rose-800 data-[state=active]:to-red-800 data-[state=active]:text-white data-[state=active]:shadow-md transition-all duration-200 px-1 py-2 mx-0.5 rounded-md min-h-[40px] flex items-center justify-center">Customer Estimates</TabsTrigger>
-              <TabsTrigger value="categories" data-testid="tab-categories" className="text-xs md:text-sm font-medium text-rose-700 hover:text-rose-900 hover:bg-rose-100 data-[state=active]:bg-gradient-to-r data-[state=active]:from-rose-800 data-[state=active]:to-red-800 data-[state=active]:text-white data-[state=active]:shadow-md transition-all duration-200 px-1 py-2 mx-0.5 rounded-md min-h-[40px] flex items-center justify-center">Categories</TabsTrigger>
-              <TabsTrigger value="pricing" data-testid="tab-pricing" className="text-xs md:text-sm font-medium text-rose-700 hover:text-rose-900 hover:bg-rose-100 data-[state=active]:bg-gradient-to-r data-[state=active]:from-rose-800 data-[state=active]:to-red-800 data-[state=active]:text-white data-[state=active]:shadow-md transition-all duration-200 px-1 py-2 mx-0.5 rounded-md min-h-[40px] flex items-center justify-center">Pricing</TabsTrigger>
-              <TabsTrigger value="barcodes" data-testid="tab-barcodes" className="text-xs md:text-sm font-medium text-rose-700 hover:text-rose-900 hover:bg-rose-100 data-[state=active]:bg-gradient-to-r data-[state=active]:from-rose-800 data-[state=active]:to-red-800 data-[state=active]:text-white data-[state=active]:shadow-md transition-all duration-200 px-1 py-2 mx-0.5 rounded-md min-h-[40px] flex items-center justify-center">QR Codes</TabsTrigger>
-              <TabsTrigger value="home-sections" data-testid="tab-home-sections" className="text-xs md:text-sm font-medium text-rose-700 hover:text-rose-900 hover:bg-rose-100 data-[state=active]:bg-gradient-to-r data-[state=active]:from-rose-800 data-[state=active]:to-red-800 data-[state=active]:text-white data-[state=active]:shadow-md transition-all duration-200 px-1 py-2 mx-0.5 rounded-md min-h-[40px] flex items-center justify-center">Home Sections</TabsTrigger>
-              <TabsTrigger value="orders" data-testid="tab-orders" className="text-xs md:text-sm font-medium text-rose-700 hover:text-rose-900 hover:bg-rose-100 data-[state=active]:bg-gradient-to-r data-[state=active]:from-rose-800 data-[state=active]:to-red-800 data-[state=active]:text-white data-[state=active]:shadow-md transition-all duration-200 px-1 py-2 mx-0.5 rounded-md min-h-[40px] flex items-center justify-center">Order Tracking</TabsTrigger>
-            </TabsList>
           </div>
-
-          <TabsContent value="products" className="space-y-6">
-            <ProductForm currency={selectedCurrency} />
-          </TabsContent>
-
-          <TabsContent value="billing" className="space-y-6">
-            <BillingForm 
-              currency={selectedCurrency} 
-              products={products} 
-            />
-          </TabsContent>
-
-          <TabsContent value="bills" className="space-y-6">
-            <Card data-testid="card-bills-history">
-              <CardHeader>
-                <CardTitle>Bills History</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {/* Search Bills */}
-                  <div className="relative">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-                    <input
-                      type="text"
-                      placeholder="Search by customer name, mobile number, or bill number..."
-                      value={billSearchTerm}
-                      onChange={(e) => setBillSearchTerm(e.target.value)}
-                      className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-transparent"
-                      data-testid="input-search-bills"
-                    />
-                  </div>
-                  {bills.length === 0 ? (
-                    <p className="text-gray-500 text-center py-8" data-testid="message-no-bills">
-                      No bills generated yet.
-                    </p>
-                  ) : (
-                    <div className="overflow-x-auto">
-                      <table className="w-full bg-white rounded-lg">
-                        <thead className="bg-gray-50">
-                          <tr>
-                            <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">Bill No.</th>
-                            <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">Customer</th>
-                            <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">Date</th>
-                            <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">Amount</th>
-                            <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">Currency</th>
-                            <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">Actions</th>
-                          </tr>
-                        </thead>
-                        <tbody className="divide-y divide-gray-200">
-                          {bills
-                            .filter(bill => {
-                              if (!billSearchTerm) return true;
-                              const searchLower = billSearchTerm.toLowerCase();
-                              return (
-                                bill.customerName.toLowerCase().includes(searchLower) ||
-                                bill.customerPhone.toLowerCase().includes(searchLower) ||
-                                bill.billNumber.toLowerCase().includes(searchLower)
-                              );
-                            })
-                            .map((bill) => (
-                            <tr key={bill.id} className="hover:bg-gray-50" data-testid={`row-bill-${bill.id}`}>
-                              <td className="px-4 py-3 text-sm font-medium text-black">{bill.billNumber}</td>
-                              <td className="px-4 py-3 text-sm text-gray-700">{bill.customerName}</td>
-                              <td className="px-4 py-3 text-sm text-gray-700">
-                                {new Date(bill.createdAt!).toLocaleDateString()}
-                              </td>
-                              <td className="px-4 py-3 text-sm font-medium text-black">
-                                {bill.currency === 'INR' ? '₹' : 'BD'} {parseFloat(bill.total).toLocaleString()}
-                              </td>
-                              <td className="px-4 py-3 text-sm text-gray-700">{bill.currency}</td>
-                              <td className="px-4 py-3 text-sm">
-                                <div className="flex items-center space-x-2">
-                                  <Button
-                                    size="sm"
-                                    variant="outline"
-                                    onClick={() => setSelectedBill(bill)}
-                                    data-testid={`button-preview-${bill.id}`}
-                                  >
-                                    Preview
-                                  </Button>
-                                  <Button
-                                    size="sm"
-                                    variant="outline"
-                                    onClick={() => {
-                                      // Store bill data in localStorage for editing
-                                      localStorage.setItem('editBill', JSON.stringify(bill));
-                                      // Set active tab immediately
-                                      setActiveTab('billing');
-                                      // Also update URL for consistency
-                                      setLocation('/admin?tab=billing');
-                                      
-                                      toast({
-                                        title: "Bill Loaded",
-                                        description: `Bill ${bill.billNumber} loaded for editing.`,
-                                      });
-                                    }}
-                                    className="border-blue-600 text-blue-600 hover:bg-blue-50"
-                                    data-testid={`button-edit-${bill.id}`}
-                                  >
-                                    <Edit className="h-4 w-4 mr-1" />
-                                    Edit
-                                  </Button>
-                                  <Button
-                                    size="sm"
-                                    variant="outline"
-                                    onClick={() => {
-                                      const link = document.createElement('a');
-                                      link.href = `/api/bills/${bill.id}/pdf`;
-                                      link.download = `${bill.customerName.replace(/\s+/g, '_')}_${bill.billNumber}.pdf`;
-                                      document.body.appendChild(link);
-                                      link.click();
-                                      document.body.removeChild(link);
-                                    }}
-                                    data-testid={`button-download-${bill.id}`}
-                                  >
-                                    Download
-                                  </Button>
-                                  <Button
-                                    size="sm"
-                                    variant="outline"
-                                    onClick={() => sendBillToWhatsAppMutation.mutate(bill.id)}
-                                    disabled={sendBillToWhatsAppMutation.isPending}
-                                    className="bg-green-50 hover:bg-green-100 text-green-700 border-green-200"
-                                    data-testid={`button-whatsapp-${bill.id}`}
-                                  >
-                                    {sendBillToWhatsAppMutation.isPending ? "Sending..." : "Send to WhatsApp"}
-                                  </Button>
-                                </div>
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-                  )}
+        );
+      case 'products':
+        return <ProductForm currency={selectedCurrency} />;
+      case 'billing':
+        return <BillingForm currency={selectedCurrency} products={products} />;
+      case 'bills':
+        return (
+          <Card>
+            <CardHeader>
+              <CardTitle>Bills History</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                  <input
+                    type="text"
+                    placeholder="Search by customer name, mobile number, or bill number..."
+                    value={billSearchTerm}
+                    onChange={(e) => setBillSearchTerm(e.target.value)}
+                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  />
                 </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="estimates" className="space-y-6">
-            <EstimatesList />
-          </TabsContent>
-
-          <TabsContent value="categories" className="space-y-6">
-            <CategoryManagement />
-          </TabsContent>
-
-          <TabsContent value="pricing" className="space-y-6">
-            <PriceManagement />
-          </TabsContent>
-
-          <TabsContent value="barcodes" className="space-y-6">
-            <Card data-testid="card-barcode-management">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <QrCode className="h-5 w-5" />
-                  Product QR Code Management
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-6">
-                  {products.length === 0 ? (
-                    <div className="text-center py-8">
-                      <QrCode className="h-16 w-16 mx-auto text-gray-400 mb-4" />
-                      <p className="text-gray-500" data-testid="message-no-products">
-                        No products available for QR code generation.
-                      </p>
-                      <p className="text-sm text-gray-400">
-                        Add products first to generate QR codes.
-                      </p>
-                    </div>
-                  ) : (
-                    <div className="space-y-6">
-                      <div className="text-sm text-gray-600 mb-4">
-                        Total Products: <span className="font-semibold">{products.length}</span> | 
-                        Products with QR Codes: <span className="font-semibold">{products.filter(p => p.productCode).length}</span>
-                      </div>
-                      
-                      {/* Search Products by Name */}
-                      <div className="relative">
-                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-                        <input
-                          type="text"
-                          placeholder="Search products by name..."
-                          value={productSearchTerm}
-                          onChange={(e) => setProductSearchTerm(e.target.value)}
-                          className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        />
-                      </div>
-                      
-                      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-                        {products
-                          .filter(product => 
-                            product.name.toLowerCase().includes(productSearchTerm.toLowerCase())
-                          )
-                          .map((product) => (
-                          <div key={product.id} className="bg-white border rounded-lg shadow-sm relative">
-                            {/* Selection Checkbox */}
-                            {product.productCode && (
-                              <div className="absolute top-3 left-3 z-10">
-                                <button
-                                  onClick={() => handleProductSelect(product.id)}
-                                  className="flex items-center justify-center w-6 h-6 border-2 border-gray-400 rounded hover:border-rose-500 transition-colors"
-                                  style={{ backgroundColor: selectedProducts.has(product.id) ? '#be185d' : 'white' }}
+                {bills.length === 0 ? (
+                  <p className="text-gray-500 text-center py-8">
+                    No bills generated yet.
+                  </p>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <table className="w-full bg-white rounded-lg">
+                      <thead className="bg-gray-50">
+                        <tr>
+                          <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">Bill No.</th>
+                          <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">Customer</th>
+                          <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">Date</th>
+                          <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">Amount</th>
+                          <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">Currency</th>
+                          <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-gray-200">
+                        {bills
+                          .filter(bill => {
+                            if (!billSearchTerm) return true;
+                            const searchLower = billSearchTerm.toLowerCase();
+                            return (
+                              bill.customerName.toLowerCase().includes(searchLower) ||
+                              bill.customerPhone.toLowerCase().includes(searchLower) ||
+                              bill.billNumber.toLowerCase().includes(searchLower)
+                            );
+                          })
+                          .map((bill) => (
+                          <tr key={bill.id} className="hover:bg-gray-50">
+                            <td className="px-4 py-3 text-sm font-medium text-black">{bill.billNumber}</td>
+                            <td className="px-4 py-3 text-sm text-gray-700">{bill.customerName}</td>
+                            <td className="px-4 py-3 text-sm text-gray-700">
+                              {new Date(bill.createdAt!).toLocaleDateString()}
+                            </td>
+                            <td className="px-4 py-3 text-sm font-medium text-black">
+                              {bill.currency === 'INR' ? '₹' : 'BD'} {parseFloat(bill.total).toLocaleString()}
+                            </td>
+                            <td className="px-4 py-3 text-sm text-gray-700">{bill.currency}</td>
+                            <td className="px-4 py-3 text-sm">
+                              <div className="flex items-center space-x-2">
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() => setSelectedBill(bill)}
                                 >
-                                  {selectedProducts.has(product.id) && (
-                                    <CheckSquare className="w-4 h-4 text-white" />
-                                  )}
-                                </button>
+                                  Preview
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() => {
+                                    localStorage.setItem('editBill', JSON.stringify(bill));
+                                    setActiveSection('billing');
+                                    
+                                    toast({
+                                      title: "Bill Loaded",
+                                      description: `Bill ${bill.billNumber} loaded for editing.`,
+                                    });
+                                  }}
+                                  className="border-blue-600 text-blue-600 hover:bg-blue-50"
+                                >
+                                  Edit
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() => {
+                                    const link = document.createElement('a');
+                                    link.href = `/api/bills/${bill.id}/pdf`;
+                                    link.download = `${bill.customerName.replace(/\s+/g, '_')}_${bill.billNumber}.pdf`;
+                                    document.body.appendChild(link);
+                                    link.click();
+                                    document.body.removeChild(link);
+                                  }}
+                                >
+                                  Download
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() => sendBillToWhatsAppMutation.mutate(bill.id)}
+                                  disabled={sendBillToWhatsAppMutation.isPending}
+                                  className="bg-green-50 hover:bg-green-100 text-green-700 border-green-200"
+                                >
+                                  {sendBillToWhatsAppMutation.isPending ? "Sending..." : "Send to WhatsApp"}
+                                </Button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        );
+      case 'estimates':
+        return <EstimatesList />;
+      case 'categories':
+        return <CategoryManagement />;
+      case 'pricing':
+        return <PriceManagement />;
+      case 'barcodes':
+        return (
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <QrCode className="h-5 w-5" />
+                Product QR Code Management
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-6">
+                {products.length === 0 ? (
+                  <div className="text-center py-8">
+                    <QrCode className="h-16 w-16 mx-auto text-gray-400 mb-4" />
+                    <p className="text-gray-500">
+                      No products available for QR code generation.
+                    </p>
+                    <p className="text-sm text-gray-400">
+                      Add products first to generate QR codes.
+                    </p>
+                  </div>
+                ) : (
+                  <div className="space-y-6">
+                    <div className="text-sm text-gray-600 mb-4">
+                      Total Products: <span className="font-semibold">{products.length}</span> | 
+                      Products with QR Codes: <span className="font-semibold">{products.filter(p => p.productCode).length}</span>
+                    </div>
+                    
+                    <div className="relative">
+                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                      <input
+                        type="text"
+                        placeholder="Search products by name..."
+                        value={productSearchTerm}
+                        onChange={(e) => setProductSearchTerm(e.target.value)}
+                        className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                      />
+                    </div>
+                    
+                    <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+                      {products
+                        .filter(product => 
+                          product.name.toLowerCase().includes(productSearchTerm.toLowerCase())
+                        )
+                        .map((product) => (
+                        <div key={product.id} className="bg-white border rounded-lg shadow-sm relative">
+                          {product.productCode && (
+                            <div className="absolute top-3 left-3 z-10">
+                              <button
+                                onClick={() => handleProductSelect(product.id)}
+                                className="flex items-center justify-center w-6 h-6 border-2 border-gray-400 rounded hover:border-purple-500 transition-colors"
+                                style={{ backgroundColor: selectedProducts.has(product.id) ? '#7c3aed' : 'white' }}
+                              >
+                                {selectedProducts.has(product.id) && (
+                                  <CheckSquare className="w-4 h-4 text-white" />
+                                )}
+                              </button>
+                            </div>
+                          )}
+                          <div className="p-4">
+                            <div className="flex items-start gap-3 mb-4">
+                              <img
+                                src={product.images?.[0] || '/placeholder-jewelry.jpg'}
+                                alt={product.name}
+                                className="w-16 h-16 rounded-lg object-cover border"
+                              />
+                              <div className="flex-1 min-w-0">
+                                <h3 className="font-semibold text-gray-900 truncate">
+                                  {product.name}
+                                </h3>
+                                <p className="text-sm text-gray-500">
+                                  {product.category}
+                                </p>
+                                <p className="text-sm font-medium text-gray-900">
+                                  ₹{parseInt(product.priceInr).toLocaleString('en-IN')}
+                                </p>
+                              </div>
+                            </div>
+                            
+                            {product.productCode ? (
+                              <div className="space-y-3">
+                                <div className="flex justify-center">
+                                  <BarcodeDisplay 
+                                    product={product}
+                                  />
+                                </div>
+                                <p className="text-xs text-center font-mono text-gray-600">
+                                  {product.productCode}
+                                </p>
+                              </div>
+                            ) : (
+                              <div className="text-center text-gray-500 py-4">
+                                <QrCode className="h-8 w-8 mx-auto mb-2 text-gray-300" />
+                                <p className="text-xs">No QR code generated</p>
                               </div>
                             )}
-                            <div className="p-4">
-                              <div className="flex items-start gap-3 mb-4">
-                                <img
-                                  src={product.images?.[0] || '/placeholder-jewelry.jpg'}
-                                  alt={product.name}
-                                  className="w-16 h-16 rounded-lg object-cover border"
-                                />
-                                <div className="flex-1 min-w-0">
-                                  <h3 className="font-semibold text-gray-900 truncate">
-                                    {product.name}
-                                  </h3>
-                                  <p className="text-sm text-gray-600">
-                                    {product.category.replace(/_/g, ' ')}
-                                  </p>
-                                  {product.productCode && (
-                                    <div className="flex items-center gap-2 mt-1">
-                                      <span className="text-xs font-mono bg-gray-100 px-2 py-1 rounded">
-                                        {product.productCode}
-                                      </span>
-                                      <span className={`text-xs px-2 py-1 rounded ${
-                                        product.stock > 10 
-                                          ? 'bg-green-100 text-green-800' 
-                                          : product.stock > 0 
-                                          ? 'bg-yellow-100 text-yellow-800' 
-                                          : 'bg-red-100 text-red-800'
-                                      }`}>
-                                        Stock: {product.stock}
-                                      </span>
-                                    </div>
-                                  )}
-                                </div>
-                              </div>
-                              
-                              <div className="space-y-2 text-sm text-gray-600 mb-4">
-                                <div className="flex justify-between">
-                                  <span>Price:</span>
-                                  <span className="font-medium">
-                                    ₹{parseInt(product.priceInr).toLocaleString('en-IN')}
-                                  </span>
-                                </div>
-                                {product.purity && (
-                                  <div className="flex justify-between">
-                                    <span>Purity:</span>
-                                    <span>{product.purity}</span>
-                                  </div>
-                                )}
-                                {product.grossWeight && (
-                                  <div className="flex justify-between">
-                                    <span>Weight:</span>
-                                    <span>{product.grossWeight}g</span>
-                                  </div>
-                                )}
-                                {product.stones && (
-                                  <div className="flex justify-between">
-                                    <span>Stones:</span>
-                                    <span>{product.stones}</span>
-                                  </div>
-                                )}
-                              </div>
-                              
-                              {product.productCode ? (
-                                <BarcodeDisplay 
-                                  product={product} 
-                                  className="border-0 shadow-none bg-gray-50"
-                                />
-                              ) : (
-                                <div className="text-center py-4 bg-gray-50 rounded-lg">
-                                  <QrCode className="h-8 w-8 mx-auto text-gray-400 mb-2" />
-                                  <p className="text-sm text-gray-500">
-                                    No QR code available
-                                  </p>
-                                  <p className="text-xs text-gray-400">
-                                    Edit product to generate QR code
-                                  </p>
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                      
-                      {/* Selection Controls */}
-                      <div className="border-t pt-6">
-                        <div className="flex flex-wrap items-center gap-3 mb-4">
-                          <div className="text-sm text-gray-600">
-                            {selectedProducts.size} of {products.filter(p => p.productCode).length} selected
-                          </div>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={handleSelectAll}
-                            disabled={products.filter(p => p.productCode).length === 0}
-                          >
-                            Select All
-                          </Button>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={handleClearSelection}
-                            disabled={selectedProducts.size === 0}
-                          >
-                            Clear Selection
-                          </Button>
-                        </div>
-
-                        {/* Bulk Actions */}
-                        <div className="flex flex-wrap gap-3">
-                          <Button 
-                            variant="default"
-                            onClick={printSelectedQRCodes}
-                            disabled={selectedProducts.size === 0}
-                            className="bg-rose-600 hover:bg-rose-700"
-                          >
-                            <Printer className="h-4 w-4 mr-2" />
-                            Print Selected QR Codes ({selectedProducts.size})
-                          </Button>
-
-                          <Button 
-                            variant="outline"
-                            onClick={() => {
-                              const printWindow = window.open('', '_blank');
-                              if (printWindow) {
-                                const productsWithBarcodes = products.filter(p => p.productCode);
-                                const barcodesHTML = productsWithBarcodes.map(product => {
-                                  const productType = product.name.split(' ')[0].toUpperCase();
-                                  return `
-                                    <div style="page-break-after: always; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px;">
-                                      <div style="border: 3px solid #000; border-radius: 15px; padding: 30px; width: 400px; text-align: center; background: white; box-shadow: 0 4px 8px rgba(0,0,0,0.1); font-family: Arial, sans-serif;">
-                                        <div style="font-size: 20px; font-weight: bold; margin-bottom: 15px; letter-spacing: 1px;">PALANIAPPA JEWELLERS</div>
-                                        <div style="font-size: 28px; font-weight: bold; margin-bottom: 15px; font-family: monospace;">${product.productCode}</div>
-                                        <div style="font-size: 18px; font-weight: bold; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center;">
-                                          <span>${productType}</span>
-                                          <span>${product.purity || '22K'}</span>
-                                        </div>
-                                        <div style="font-size: 16px; font-weight: bold; margin-bottom: 20px;">Gross Weight : ${product.grossWeight} g</div>
-                                        <div style="margin: 20px 0; display: flex; justify-content: center;">
-                                          <canvas id="qrcode-${product.id}" style="width: 150px; height: 150px;"></canvas>
-                                        </div>
-                                        <div style="font-size: 18px; font-weight: bold; margin-top: 15px; font-family: monospace;">${product.productCode}</div>
-                                      </div>
-                                    </div>
-                                  `;
-                                }).join('');
-                                
-                                printWindow.document.write(`
-                                  <html>
-                                    <head>
-                                      <title>All Product QR Codes</title>
-                                      <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
-                                    </head>
-                                    <body>
-                                      ${barcodesHTML}
-                                      <script>
-                                        ${productsWithBarcodes.map(product => `
-                                          const qrData${product.id} = \`Product Code: ${product.productCode}
-Product Name: ${product.name}
-Purity: ${product.purity || '22K'}
-Gross Weight: ${product.grossWeight} g
-Net Weight: ${product.netWeight} g
-Stone: ${product.stones || 'None'}
-Gold Rate: ${product.goldRateAtCreation ? `₹${product.goldRateAtCreation}/g` : 'N/A'}
-Approx Price: ₹${parseInt(product.priceInr).toLocaleString('en-IN')}\`;
-                                          
-                                          QRCode.toCanvas(document.getElementById("qrcode-${product.id}"), qrData${product.id}, {
-                                            width: 150,
-                                            margin: 2,
-                                            color: {
-                                              dark: '#000000',
-                                              light: '#FFFFFF'
-                                            }
-                                          });
-                                        `).join('')}
-                                        setTimeout(() => {
-                                          window.print();
-                                          window.close();
-                                        }, 1000);
-                                      </script>
-                                    </body>
-                                  </html>
-                                `);
-                                printWindow.document.close();
-                              }
-                            }}
-                            disabled={products.filter(p => p.productCode).length === 0}
-                          >
-                            <Printer className="h-4 w-4 mr-2" />
-                            Print All QR Codes ({products.filter(p => p.productCode).length})
-                          </Button>
-                          
-                          <div className="text-sm text-gray-500 flex items-center">
-                            <QrCode className="h-4 w-4 mr-1" />
-                            Only products with generated codes can be printed
                           </div>
                         </div>
-                      </div>
+                      ))}
                     </div>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
+                    
+                    {products.filter(p => p.productCode).length > 0 && (
+                      <div className="flex gap-2 justify-end">
+                        <Button
+                          variant="outline"
+                          onClick={handleSelectAll}
+                          className="text-sm"
+                        >
+                          Select All
+                        </Button>
+                        <Button
+                          variant="outline"
+                          onClick={handleClearSelection}
+                          className="text-sm"
+                        >
+                          Clear Selection
+                        </Button>
+                        <Button
+                          onClick={printSelectedQRCodes}
+                          disabled={selectedProducts.size === 0}
+                          className="bg-purple-600 hover:bg-purple-700 text-white text-sm"
+                        >
+                          <Printer className="w-4 h-4 mr-2" />
+                          Print Selected ({selectedProducts.size})
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        );
+      case 'home-sections':
+        return <HomeSectionsManagement />;
+      default:
+        return <ProductForm currency={selectedCurrency} />;
+    }
+  };
 
-          <TabsContent value="home-sections" className="space-y-6">
-            <HomeSectionsManagement />
-          </TabsContent>
+  return (
+    <div className="min-h-screen bg-gray-50 flex">
+      {/* Sidebar */}
+      <div className="w-64 bg-gradient-to-b from-purple-800 to-purple-900 shadow-xl">
+        <div className="p-6">
+          <h1 className="text-xl font-bold text-white">Jewellery Shop</h1>
+        </div>
+        
+        <nav className="mt-6 px-3">
+          <div className="space-y-1">
+            {navigation.map((item) => {
+              const Icon = item.icon;
+              const isActive = activeSection === item.id;
+              
+              return (
+                <button
+                  key={item.id}
+                  onClick={() => setActiveSection(item.id)}
+                  className={`w-full flex items-center px-3 py-3 text-sm font-medium rounded-lg transition-colors duration-200 ${
+                    isActive
+                      ? 'bg-purple-700 text-white shadow-lg'
+                      : 'text-purple-100 hover:bg-purple-700 hover:text-white'
+                  }`}
+                >
+                  <Icon className="mr-3 h-5 w-5" />
+                  {item.name}
+                </button>
+              );
+            })}
+          </div>
+        </nav>
+      </div>
 
-          <TabsContent value="orders" className="space-y-6">
-            <OrderTracking />
-          </TabsContent>
+      {/* Main Content */}
+      <div className="flex-1 flex flex-col">
+        {/* Header */}
+        <header className="bg-white shadow-sm border-b border-gray-200">
+          <div className="flex items-center justify-between px-6 py-4">
+            <div>
+              <h2 className="text-2xl font-bold text-gray-900">
+                {navigation.find(nav => nav.id === activeSection)?.name || 'Dashboard'}
+              </h2>
+            </div>
+            <div className="flex items-center space-x-4">
+              <div className="flex items-center space-x-2">
+                <User className="h-5 w-5 text-gray-500" />
+                <span className="text-sm font-medium text-gray-700">Admin</span>
+              </div>
+            </div>
+          </div>
+        </header>
 
-        </Tabs>
+        {/* Content */}
+        <main className="flex-1 p-6">
+          {renderContent()}
+        </main>
       </div>
 
       {/* Bill Preview Modal */}
