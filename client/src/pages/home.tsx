@@ -211,14 +211,14 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen" data-testid="page-home" style={{ background: 'linear-gradient(135deg, #fdfbf7 0%, #fff9e6 100%)' }}>
+    <div className="min-h-screen" data-testid="page-home" style={{ background: 'linear-gradient(135deg, #fefefe 0%, #faf9f6 100%)' }}>
       <Header
         selectedCurrency={selectedCurrency}
         onCurrencyChange={setSelectedCurrency}
       />
 
       {/* 1. Explore Our Collections - New Carousel Design */}
-      <section className="pt-6 pb-8" data-testid="section-categories" style={{ background: 'linear-gradient(135deg, #fef3c7 0%, #fed7aa 100%)' }}>
+      <section className="pt-6 pb-8" data-testid="section-categories" style={{ background: 'linear-gradient(135deg, #fefdfb 0%, #fef9f4 100%)' }}>
         <div className="container mx-auto px-4">
           <div className="text-center mb-6">
             <h2 className="text-lg sm:text-2xl md:text-4xl font-bold" style={{ color: '#8b4513' }}>Explore Our Collections</h2>
