@@ -180,7 +180,7 @@ Could you please provide more details?`;
                 {customDisplayPrice || formatPrice(price, currency)}
               </p>
               {product.stock > 0 && product.stock <= 5 && (
-                <p className="hidden sm:block text-[10px] sm:text-xs text-amber-600">
+                <p className="hidden sm:block text-[10px] sm:text-xs text-black">
                   Only {product.stock} left
                 </p>
               )}
