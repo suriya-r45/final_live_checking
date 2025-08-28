@@ -29,8 +29,8 @@ export function BarcodeDisplay({ product, className }: BarcodeDisplayProps) {
 📉 Gold Rate: ${product.goldRateAtCreation ? `₹${product.goldRateAtCreation}/g` : 'N/A'}
 💰 Approx Price: ₹${parseInt(product.priceInr).toLocaleString('en-IN')}
 
-📞 Contact: +91 95972 01554
-💬 WhatsApp: +91 95972 01554`;
+📞 Contact: +91 994 206 1393
+💬 WhatsApp: +91 994 206 1393`;
 
         QRCode.toCanvas(qrCodeRef.current, qrData, {
           width: 200,
@@ -63,8 +63,8 @@ export function BarcodeDisplay({ product, className }: BarcodeDisplayProps) {
 📉 Gold Rate: ${product.goldRateAtCreation ? `₹${product.goldRateAtCreation}/g` : 'N/A'}
 💰 Approx Price: ₹${parseInt(product.priceInr).toLocaleString('en-IN')}
 
-📞 Contact: +91 95972 01554
-💬 WhatsApp: +91 95972 01554`;
+📞 Contact: +91 994 206 1393
+💬 WhatsApp: +91 994 206 1393`;
 
     try {
       const qrCodeDataURL = await QRCode.toDataURL(qrData, {

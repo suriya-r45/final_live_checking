@@ -59,6 +59,57 @@ async function sendWelcomeWhatsAppMessage(name: string, phone: string) {
   return whatsappUrl;
 }
 
+// Function to send WhatsApp notification to admin for new orders
+async function sendAdminOrderNotification(billData: any) {
+  const adminPhone = "+919942061393"; // Admin WhatsApp number
+  
+  const message = `🔔 NEW ORDER RECEIVED!
+
+` +
+    `👤 Customer: ${billData.customerName}
+` +
+    `📞 Phone: ${billData.customerPhone}
+` +
+    `📧 Email: ${billData.customerEmail}
+` +
+    `💵 Total Amount: ${billData.currency === 'INR' ? '₹' : 'BD'} ${billData.total}
+` +
+    `💳 Payment Method: ${billData.paymentMethod}
+` +
+    `📋 Bill Number: ${billData.billNumber}
+` +
+    `🗓️ Date: ${new Date().toLocaleString()}
+
+` +
+    `Please process this order promptly.
+
+` +
+    `Palaniappa Jewellers - Admin Alert`;
+  
+  try {
+    if (!twilioClient) {
+      console.log('[WhatsApp Notification] Twilio not configured, logging notification instead');
+      console.log(`[New Order] Admin notification for Bill ${billData.billNumber}: ${message}`);
+      return { success: false, error: 'Twilio not configured' };
+    }
+
+    // Send WhatsApp message to admin
+    const twilioMessage = await twilioClient.messages.create({
+      body: message,
+      from: `whatsapp:${process.env.TWILIO_PHONE_NUMBER}`, // Twilio WhatsApp number
+      to: `whatsapp:${adminPhone}` // Admin WhatsApp number
+    });
+
+    console.log(`[Admin WhatsApp] Order notification sent for Bill ${billData.billNumber} - Message SID: ${twilioMessage.sid}`);
+    return { success: true, messageSid: twilioMessage.sid };
+  } catch (error) {
+    console.error(`[Admin WhatsApp Error] Failed to send order notification:`, error);
+    // Log the notification even if sending fails
+    console.log(`[New Order] Admin notification for Bill ${billData.billNumber}: ${message}`);
+    return { success: false, error: error instanceof Error ? error.message : 'Unknown error occurred' };
+  }
+}
+
 async function sendOtpSMS(name: string, phone: string, otp: string) {
   const message = `🔐 Palaniappa Jewellers - Password Reset OTP
 
@@ -72,7 +123,7 @@ Please do not share this OTP with anyone.
 If you didn't request this, please ignore this message.
 
 Palaniappa Jewellers
-Contact: +919597201554`;
+Contact: +919942061393`;
 
   try {
     // Format phone number (ensure it starts with +)
@@ -624,6 +675,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
         billNumber: billNumber
       } as any);
 
+      // Send WhatsApp notification to admin about new order
+      try {
+        await sendAdminOrderNotification({
+          ...bill,
+          ...billData
+        });
+        console.log(`[New Order] Admin notification sent for Bill ${billNumber}`);
+      } catch (error) {
+        console.error(`[New Order] Failed to send admin notification for Bill ${billNumber}:`, error);
+        // Don't fail the order creation if notification fails
+      }
+
       res.status(201).json(bill);
     } catch (error: any) {
       console.error("Zod validation error:", error.errors || error);
@@ -706,7 +769,7 @@ VAT: ${currencySymbol}${parseFloat(bill.vat).toLocaleString()}
 Thank you for choosing Palaniappa Jewellers!
 Where every jewel is crafted for elegance that lasts generations.
 
-Contact us: +919597201554
+Contact us: +919942061393
 Premium quality, timeless beauty.`;
 
       // Create WhatsApp URL
@@ -834,7 +897,7 @@ Premium quality, timeless beauty.`;
          .text('123 Jewelry Street', margin + 8, detailsY + 38)
          .text('Chennai, Tamil Nadu', margin + 8, detailsY + 51)
          .text('PINCODE: 600001', margin + 8, detailsY + 64)
-         .text('Phone Number: +919597201554', margin + 8, detailsY + 77)
+         .text('Phone Number: +919942061393', margin + 8, detailsY + 77)
          .text('GSTIN: 33AAACT5712A124', margin + 8, detailsY + 90)
          .text('Email: jewelerypalaniappa@gmail.com', margin + 8, detailsY + 103);
 
@@ -1161,7 +1224,7 @@ Premium quality, timeless beauty.`;
           senderState: "Tamil Nadu",
           senderCountry: "India",
           senderPostalCode: "636001",
-          senderPhone: "+919597201554",
+          senderPhone: "+919942061393",
           recipientName: orderData.customerName,
           recipientAddress: orderData.customerAddress,
           recipientCity: "Unknown", // We'll improve this later with better address parsing

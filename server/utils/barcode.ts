@@ -332,8 +332,8 @@ export async function generateQRCode(data: ProductBarcodeData, productCode: stri
 📉 Gold Rate: ${data.goldRate}
 💰 Approx Price: ${data.approxPrice}
 
-📞 Contact: +91 95972 01554
-💬 WhatsApp: +91 95972 01554`;
+📞 Contact: +91 994 206 1393
+💬 WhatsApp: +91 994 206 1393`;
 
     // Generate QR code
     const filename = `qr-${productCode.replace(/[^a-zA-Z0-9]/g, '_')}-${Date.now()}.png`;

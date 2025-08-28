@@ -203,7 +203,7 @@ export default function ProductDetails() {
                 onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#25D366'}
                 onClick={() => {
                   const message = `Hi! I'm interested in this beautiful piece: *${product.name}*\n\nPrice: ${selectedCurrency === 'INR' ? '₹' + product.priceInr : 'BD ' + product.priceBhd}\nCategory: ${product.category.replace(/_/g, ' ')}\n\nCould you provide more details about this jewelry piece?`;
-                  const whatsappUrl = `https://wa.me/919597201554?text=${encodeURIComponent(message)}`;
+                  const whatsappUrl = `https://wa.me/919942061393?text=${encodeURIComponent(message)}`;
                   window.open(whatsappUrl, '_blank');
                 }}
                 data-testid="button-whatsapp-main-image"
@@ -246,7 +246,7 @@ export default function ProductDetails() {
                       onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#25D366'}
                       onClick={() => {
                         const message = `Hi! I'd like to inquire about this specific view of *${product.name}* (Image ${index + 1})\n\nPrice: ${selectedCurrency === 'INR' ? '₹' + product.priceInr : 'BD ' + product.priceBhd}\nCategory: ${product.category.replace(/_/g, ' ')}\n\nCould you tell me more about this angle/detail of the jewelry?`;
-                        const whatsappUrl = `https://wa.me/919597201554?text=${encodeURIComponent(message)}`;
+                        const whatsappUrl = `https://wa.me/919942061393?text=${encodeURIComponent(message)}`;
                         window.open(whatsappUrl, '_blank');
                       }}
                       data-testid={`button-whatsapp-thumbnail-${index}`}
