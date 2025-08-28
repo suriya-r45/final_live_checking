@@ -41,7 +41,7 @@ export default function Header({ selectedCurrency, onCurrencyChange }: HeaderPro
   return (
     <>
       {/* Main Header */}
-      <header className="bg-white shadow-sm sticky top-0 z-50" data-testid="header-main">
+      <header className="bg-gradient-to-r from-amber-50 to-orange-50 shadow-sm sticky top-0 z-50 border-b border-amber-100" data-testid="header-main">
         <div className="container mx-auto px-4">
           {/* Top Row */}
           <div className="flex items-center justify-between h-16 md:h-20">
