@@ -57,20 +57,88 @@ export default function Header({ selectedCurrency, onCurrencyChange }: HeaderPro
                 <Menu className="h-6 w-6" />
               </Button>
 
-              {/* Brand Name */}
-              <Link href="/" className="flex items-center" data-testid="link-home">
-                <h1 className="text-xl md:text-2xl font-bold text-amber-900 tracking-wide">
-                  PALANIAPPA JEWELLERS
-                </h1>
+              {/* Brand with Logo */}
+              <Link href="/" className="flex items-center space-x-2 md:space-x-3" data-testid="link-home">
+                <div className="w-8 h-8 md:w-12 md:h-12 rounded-full overflow-hidden border border-gray-300">
+                  <img 
+                    src={logoPath} 
+                    alt="Palaniappa Jewellers Logo" 
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <div>
+                  <h1 className="text-lg md:text-2xl font-bold text-amber-900 tracking-wide">PALANIAPPA JEWELLERS</h1>
+                  <p className="text-xs text-gray-600 font-medium">Since 2025</p>
+                </div>
               </Link>
             </div>
 
             {/* Right Section - Icons */}
-            <div className="flex items-center space-x-4">
-              {/* Store Icon */}
-              <button className="p-2 hover:bg-gray-100 rounded-lg">
-                <Store className="h-6 w-6 text-gray-800" />
-              </button>
+            <div className="flex items-center space-x-2 md:space-x-4">
+              {/* Currency Selection */}
+              <Select value={selectedCurrency} onValueChange={onCurrencyChange} data-testid="select-currency">
+                <SelectTrigger className="bg-transparent border-0 text-gray-800 hover:text-amber-900 p-0 h-auto transition-colors duration-200 w-16 md:w-20">
+                  <div className="flex flex-col items-center cursor-pointer w-full">
+                    <span className="text-[8px] md:text-xs whitespace-nowrap mb-0.5">Country</span>
+                    <div className="text-center text-[9px] md:text-xs font-medium">
+                      <SelectValue />
+                    </div>
+                  </div>
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="INR" data-testid="option-inr">
+                    <div className="flex items-center gap-2">
+                      <svg className="w-5 h-5 rounded-sm" viewBox="0 0 24 24" fill="none">
+                        <rect width="24" height="8" fill="#FF9933"/>
+                        <rect y="8" width="24" height="8" fill="#FFFFFF"/>
+                        <rect y="16" width="24" height="8" fill="#138808"/>
+                        <circle cx="12" cy="12" r="3" fill="#000080"/>
+                      </svg>
+                      <span>₹ INR</span>
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="BHD" data-testid="option-bhd">
+                    <div className="flex items-center gap-2">
+                      <svg className="w-5 h-5 rounded-sm" viewBox="0 0 24 24" fill="none">
+                        <rect width="24" height="12" fill="#FFFFFF"/>
+                        <rect y="12" width="24" height="12" fill="#CE1126"/>
+                        <path d="M0 0 L8 6 L0 12 V8 L4 6 L0 4 Z" fill="#CE1126"/>
+                      </svg>
+                      <span>BD BHD</span>
+                    </div>
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+
+              {/* Login/Profile */}
+              <div className="flex flex-col items-center px-1">
+                {user ? (
+                  <div className="flex items-center space-x-1 md:space-x-2">
+                    {isAdmin && (
+                      <Link href="/admin">
+                        <Button variant="ghost" size="sm" className="text-gray-800 hover:text-amber-900 hover:bg-gray-100 transition-all duration-200 px-2 py-1" data-testid="button-admin-dashboard">
+                          <span className="text-xs">Dashboard</span>
+                        </Button>
+                      </Link>
+                    )}
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={handleLogout}
+                      className="p-2 text-gray-800 hover:text-amber-900 hover:bg-gray-100 rounded-lg transition-all duration-200"
+                      data-testid="button-logout"
+                    >
+                      <LogOut className="h-6 w-6" />
+                    </Button>
+                  </div>
+                ) : (
+                  <Link href="/login">
+                    <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors duration-200">
+                      <User className="h-6 w-6 text-gray-800" />
+                    </button>
+                  </Link>
+                )}
+              </div>
 
               {/* Wishlist Heart */}
               <button className="p-2 hover:bg-gray-100 rounded-lg">
@@ -113,69 +181,6 @@ export default function Header({ selectedCurrency, onCurrencyChange }: HeaderPro
           </div>
         </div>
 
-        {/* Hidden Desktop Menu Items (accessible via mobile menu) */}
-        <div className="hidden">
-          {/* Currency/Country Selection */}
-          <Select value={selectedCurrency} onValueChange={onCurrencyChange} data-testid="select-currency">
-            <SelectTrigger className="w-32">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="INR" data-testid="option-inr">
-                <div className="flex items-center gap-2">
-                  <svg className="w-5 h-5 rounded-sm" viewBox="0 0 24 24" fill="none">
-                    <rect width="24" height="8" fill="#FF9933"/>
-                    <rect y="8" width="24" height="8" fill="#FFFFFF"/>
-                    <rect y="16" width="24" height="8" fill="#138808"/>
-                    <circle cx="12" cy="12" r="3" fill="#000080"/>
-                  </svg>
-                  <span>₹ INR</span>
-                </div>
-              </SelectItem>
-              <SelectItem value="BHD" data-testid="option-bhd">
-                <div className="flex items-center gap-2">
-                  <svg className="w-5 h-5 rounded-sm" viewBox="0 0 24 24" fill="none">
-                    <rect width="24" height="12" fill="#FFFFFF"/>
-                    <rect y="12" width="24" height="12" fill="#CE1126"/>
-                    <path d="M0 0 L8 6 L0 12 V8 L4 6 L0 4 Z" fill="#CE1126"/>
-                  </svg>
-                  <span>BD BHD</span>
-                </div>
-              </SelectItem>
-            </SelectContent>
-          </Select>
-
-          {/* User Profile Section */}
-          <div>
-            {user ? (
-              <div className="flex items-center space-x-2">
-                {isAdmin && (
-                  <Link href="/admin">
-                    <Button variant="ghost" size="sm" data-testid="button-admin-dashboard">
-                      Dashboard
-                    </Button>
-                  </Link>
-                )}
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={handleLogout}
-                  data-testid="button-logout"
-                >
-                  <LogOut className="h-4 w-4 mr-2" />
-                  {user.name}
-                </Button>
-              </div>
-            ) : (
-              <Link href="/login">
-                <Button variant="ghost" size="sm">
-                  <User className="h-4 w-4 mr-2" />
-                  Login
-                </Button>
-              </Link>
-            )}
-          </div>
-        </div>
       </header>
 
       {/* Mobile Menu */}
